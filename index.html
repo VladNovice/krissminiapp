@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>KRISS — Pure Glass</title>
+    <title>KRISS — Noir App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #000000;
-            --glass-base: rgba(255, 255, 255, 0.03);
-            --glass-active: rgba(255, 255, 255, 0.08);
-            --hairline: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-deep: rgba(10, 10, 10, 0.8);
+            --hairline: rgba(255, 255, 255, 0.08);
             --sakura: #ffb7c5;
         }
 
@@ -37,75 +37,75 @@
             pointer-events: none;
         }
 
-        /* App Shell */
+        /* App Layout */
         .app {
             position: relative;
             z-index: 1;
-            padding: calc(env(safe-area-inset-top) + 15px) 16px 140px;
+            padding: calc(env(safe-area-inset-top) + 10px) 16px 140px;
         }
 
+        /* Header with Logo on the Left */
         header {
-            text-align: center;
-            margin-bottom: 25px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 0 20px 4px;
         }
 
-        .logo {
-            font-weight: 100;
-            font-size: 24px;
-            letter-spacing: 12px;
-            text-transform: uppercase;
-            background: linear-gradient(180deg, #fff 0%, #666 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .logo-img {
+            height: 32px;
+            filter: invert(1); /* Инверсия, чтобы черный логотип стал белым на черном фоне */
+            object-fit: contain;
         }
 
-        /* Капсульное меню (Telegram Style) */
-        .nav-pill-container {
+        /* Капсульное меню в стиле папок Telegram */
+        .nav-container {
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             position: sticky;
             top: calc(env(safe-area-inset-top) + 10px);
             z-index: 100;
         }
 
-        .nav-pill {
+        .nav-capsule {
             display: flex;
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             padding: 4px;
-            border-radius: 24px;
+            border-radius: 20px;
             box-shadow: inset 0 0 0 0.5px var(--hairline);
-            width: fit-content;
-            max-width: 100%;
+            width: 100%;
             overflow-x: auto;
             scrollbar-width: none;
         }
-        .nav-pill::-webkit-scrollbar { display: none; }
+        .nav-capsule::-webkit-scrollbar { display: none; }
 
-        .nav-btn {
-            padding: 8px 20px;
-            border-radius: 20px;
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 16px;
             font-size: 13px;
             font-weight: 300;
             color: rgba(255, 255, 255, 0.4);
             transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             white-space: nowrap;
+            min-width: 80px;
         }
 
-        .nav-btn.active {
+        .nav-item.active {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* Hero Image */
+        /* Hero (Уменьшен) */
         .hero {
             position: relative;
             width: 100%;
-            height: 280px;
-            border-radius: 38px;
+            height: 240px;
+            border-radius: 35px;
             overflow: hidden;
             margin-bottom: 25px;
             box-shadow: inset 0 0 0 0.5px var(--hairline);
@@ -113,7 +113,7 @@
 
         .hero img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Product Card (No Borders) */
+        /* Grid */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -121,12 +121,12 @@
         }
 
         .card {
-            background: var(--glass-base);
+            background: var(--glass);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-radius: 32px;
+            border-radius: 30px;
             padding: 6px;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: inset 0 0 0 0.5px var(--hairline);
         }
 
@@ -136,16 +136,16 @@
             width: 100%;
             aspect-ratio: 0.85;
             object-fit: cover;
-            border-radius: 26px;
+            border-radius: 25px;
             margin-bottom: 10px;
         }
 
         .card-body { padding: 0 10px 10px; }
-        .card-label { font-size: 11px; font-weight: 200; opacity: 0.4; text-transform: uppercase; letter-spacing: 1px; }
-        .card-name { font-size: 14px; font-weight: 300; margin: 2px 0 6px; }
-        .card-price { font-size: 15px; font-weight: 400; color: #fff; }
+        .card-cat { font-size: 10px; font-weight: 200; opacity: 0.4; text-transform: uppercase; letter-spacing: 1.5px; }
+        .card-name { font-size: 14px; font-weight: 300; margin: 4px 0; }
+        .card-price { font-size: 15px; font-weight: 400; }
 
-        /* iOS Dock (Floating) */
+        /* iOS Floating Dock */
         .dock-container {
             position: fixed;
             bottom: calc(env(safe-area-inset-bottom) + 20px);
@@ -155,39 +155,39 @@
         }
 
         .dock {
-            background: rgba(10, 10, 10, 0.7);
-            backdrop-filter: blur(35px) saturate(1.5);
-            -webkit-backdrop-filter: blur(35px) saturate(1.5);
-            padding: 10px 30px;
+            background: rgba(15, 15, 15, 0.75);
+            backdrop-filter: blur(35px) saturate(1.8);
+            -webkit-backdrop-filter: blur(35px) saturate(1.8);
+            padding: 10px 35px;
             border-radius: 40px;
             display: flex;
             gap: 45px;
-            box-shadow: inset 0 0 0 0.5px var(--hairline), 0 20px 40px rgba(0,0,0,0.6);
+            box-shadow: inset 0 0 0 0.5px var(--hairline), 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        .dock-item {
+        .dock-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            opacity: 0.3;
+            opacity: 0.35;
             transition: 0.3s;
             position: relative;
         }
 
-        .dock-item.active { opacity: 1; }
-        .dock-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
-        .dock-item span { font-size: 9px; font-weight: 300; letter-spacing: 0.5px; }
+        .dock-btn.active { opacity: 1; }
+        .dock-btn svg { width: 22px; height: 22px; margin-bottom: 4px; }
+        .dock-btn span { font-size: 9px; font-weight: 300; letter-spacing: 0.5px; }
 
-        .cart-dot {
+        .cart-indicator {
             position: absolute;
             top: -2px; right: -4px;
             background: var(--sakura);
             width: 6px; height: 6px;
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--sakura);
+            box-shadow: 0 0 8px var(--sakura);
         }
 
-        /* Fullscreen Modal */
+        /* Modal Product Detail */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -207,26 +207,27 @@
             align-items: center;
         }
 
-        .btn-close {
-            background: var(--glass-active);
+        .btn-back {
+            background: var(--glass);
             padding: 8px 16px;
             border-radius: 18px;
             font-size: 14px;
             font-weight: 300;
+            box-shadow: inset 0 0 0 0.5px var(--hairline);
         }
 
         .modal-body { padding: 20px; overflow-y: auto; }
-        .modal-img { width: 100%; border-radius: 40px; margin-bottom: 30px; box-shadow: inset 0 0 0 0.5px var(--hairline); }
+        .modal-img { width: 100%; border-radius: 35px; margin-bottom: 30px; box-shadow: inset 0 0 0 0.5px var(--hairline); }
 
-        .size-grid { display: flex; gap: 10px; margin: 25px 0; }
+        .size-selector { display: flex; gap: 10px; margin: 25px 0; }
         .size-item {
             flex: 1; padding: 18px; border-radius: 20px;
-            background: var(--glass-base); box-shadow: inset 0 0 0 0.5px var(--hairline);
+            background: var(--glass); box-shadow: inset 0 0 0 0.5px var(--hairline);
             text-align: center; font-weight: 300; transition: 0.3s;
         }
         .size-item.active { background: #fff; color: #000; font-weight: 500; }
 
-        .btn-main {
+        .btn-buy {
             width: 100%; padding: 22px; border-radius: 28px;
             background: #fff; color: #000; border: none;
             font-size: 17px; font-weight: 500;
@@ -240,50 +241,51 @@
 
 <div class="app">
     <header>
-        <div class="logo">KRISS</div>
+        <!-- Логотип слева -->
+        <img src="https://base-public.s3.eu-central-1.amazonaws.com/temp/kriss_logo.png" class="logo-img" alt="KRISS">
     </header>
 
-    <div class="nav-pill-container">
-        <div class="nav-pill">
-            <div class="nav-btn active" onclick="filter('все', this)">Все</div>
-            <div class="nav-btn" onclick="filter('пижамы', this)">Пижамы</div>
-            <div class="nav-btn" onclick="filter('белье', this)">Белье</div>
-            <div class="nav-btn" onclick="filter('халаты', this)">Халаты</div>
+    <div class="nav-container">
+        <div class="nav-capsule">
+            <div class="nav-item active" onclick="filter('все', this)">Все</div>
+            <div class="nav-item" onclick="filter('пижамы', this)">Пижамы</div>
+            <div class="nav-item" onclick="filter('белье', this)">Белье</div>
+            <div class="nav-item" onclick="filter('халаты', this)">Халаты</div>
         </div>
     </div>
 
     <div class="hero" onclick="openProduct(1)">
-        <img src="https://images.unsplash.com/photo-1515377662630-cd03bc627824?q=80&w=1000" alt="KRISS Luxury">
+        <img src="https://images.unsplash.com/photo-1515377662630-cd03bc627824?q=80&w=1000" alt="KRISS Collection">
     </div>
 
     <div class="grid" id="catalog">
-        <!-- Products -->
+        <!-- JS Injection -->
     </div>
 </div>
 
 <div class="dock-container">
     <div class="dock">
-        <div class="dock-item active">
+        <div class="dock-btn active">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.2"/></svg>
-            <span>ВИТРИНА</span>
+            <span>МАГАЗИН</span>
         </div>
-        <div class="dock-item" onclick="tg.showAlert('Поиск скоро появится')">
+        <div class="dock-btn" onclick="tg.showAlert('Поиск скоро появится')">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="1.2"/></svg>
             <span>ПОИСК</span>
         </div>
-        <div class="dock-item" id="cart-btn">
-            <div id="cart-dot" style="display:none" class="cart-dot"></div>
+        <div class="dock-btn">
+            <div id="cart-dot" style="display:none" class="cart-indicator"></div>
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.2"/></svg>
-            <span>ИЗБРАННОЕ</span>
+            <span>ЛЮБИМОЕ</span>
         </div>
     </div>
 </div>
 
 <div id="modal" class="modal">
     <div class="modal-nav">
-        <div class="btn-close" onclick="closeModal()">Назад</div>
-        <div style="font-weight: 200; letter-spacing: 2px; font-size: 14px;">KRISS NOIR</div>
-        <div style="width: 50px;"></div>
+        <div class="btn-back" onclick="closeModal()">Назад</div>
+        <div style="font-weight: 200; letter-spacing: 2px; font-size: 13px; opacity: 0.6;">ДЕТАЛИ</div>
+        <div style="width: 60px;"></div>
     </div>
     <div class="modal-body" id="modal-content"></div>
 </div>
@@ -306,7 +308,7 @@
             <div class="card" onclick="openProduct(${p.id})">
                 <img src="${p.img}" loading="lazy">
                 <div class="card-body">
-                    <div class="card-label">${p.cat}</div>
+                    <div class="card-cat">${p.cat}</div>
                     <div class="card-name">${p.name}</div>
                     <div class="card-price">${p.price.toLocaleString()} ₽</div>
                 </div>
@@ -315,7 +317,7 @@
     }
 
     function filter(category, el) {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         const filtered = category === 'все' ? PRODUCTS : PRODUCTS.filter(p => p.cat === category);
         render(filtered);
@@ -329,17 +331,17 @@
         
         content.innerHTML = `
             <img src="${p.img}" class="modal-img">
-            <div class="card-label" style="margin-bottom:10px">${p.cat}</div>
+            <div class="card-cat" style="margin-bottom:8px">${p.cat}</div>
             <h2 style="font-weight: 200; font-size: 32px; margin-bottom: 12px;">${p.name}</h2>
             <p style="opacity: 0.5; font-weight: 300; line-height: 1.6; margin-bottom: 30px;">${p.desc}</p>
             
-            <div class="size-grid">
+            <div class="size-selector">
                 <div class="size-item active" onclick="selectSize(this)">S</div>
                 <div class="size-item" onclick="selectSize(this)">M</div>
                 <div class="size-item" onclick="selectSize(this)">L</div>
             </div>
             
-            <button class="btn-main" onclick="addToCart()">Добавить — ${p.price.toLocaleString()} ₽</button>
+            <button class="btn-buy" onclick="addToCart()">Добавить — ${p.price.toLocaleString()} ₽</button>
         `;
         modal.style.display = 'flex';
         tg.HapticFeedback.impactOccurred('medium');
@@ -379,14 +381,14 @@
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height - canvas.height;
             this.size = Math.random() * 3 + 1;
-            this.speed = Math.random() * 0.3 + 0.1;
+            this.speed = Math.random() * 0.25 + 0.1;
             this.angle = Math.random() * Math.PI * 2;
             this.spin = Math.random() * 0.01 - 0.005;
-            this.opacity = Math.random() * 0.15 + 0.05;
+            this.opacity = Math.random() * 0.12 + 0.05;
         }
         update() {
             this.y += this.speed;
-            this.x += Math.sin(this.y / 80) * 0.2;
+            this.x += Math.sin(this.y / 100) * 0.2;
             this.angle += this.spin;
             if (this.y > canvas.height) this.init();
         }
@@ -402,7 +404,7 @@
         }
     }
 
-    for (let i = 0; i < 25; i++) petals.push(new Petal());
+    for (let i = 0; i < 20; i++) petals.push(new Petal());
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
