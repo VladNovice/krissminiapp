@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>KRISS — Noir Edition</title>
+    <title>KRISS — Noir Edition 2026</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #000000;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-heavy: rgba(15, 15, 15, 0.75);
-            --hairline: rgba(255, 255, 255, 0.12);
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --accent: #ffffff;
-            --ios-blue: #007AFF;
+            --system-gray: #1c1c1e;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -26,89 +25,125 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.4; }
 
-        .app { position: relative; z-index: 1; padding: calc(env(safe-area-inset-top) + 10px) 16px 140px; min-height: 100vh; }
+        .app { position: relative; z-index: 1; padding: calc(env(safe-area-inset-top) + 10px) 16px 140px; }
 
-        /* Header & Logo Left */
+        /* Header */
         header { display: flex; justify-content: flex-start; padding: 10px 0 25px 4px; }
-        .logo-img { height: 32px; width: auto; object-fit: contain; filter: brightness(0) invert(1); }
+        .logo-img { height: 28px; filter: brightness(0) invert(1); letter-spacing: 4px; font-weight: 200; }
 
-        /* Navigation */
-        .nav-container { display: flex; justify-content: center; margin-bottom: 25px; position: sticky; top: calc(env(safe-area-inset-top) + 10px); z-index: 100; }
-        .nav-capsule { display: flex; background: rgba(15, 15, 15, 0.7); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 4px; border-radius: 22px; box-shadow: inset 0 0 0 0.5px var(--hairline); width: 100%; }
-        .nav-item { flex: 1; text-align: center; padding: 10px 0; border-radius: 18px; font-size: 13px; font-weight: 300; color: rgba(255, 255, 255, 0.4); transition: 0.3s; }
-        .nav-item.active { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        /* Catalog Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .card { background: var(--glass); border-radius: 24px; overflow: hidden; border: 0.5px solid var(--glass-border); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card:active { transform: scale(0.96); opacity: 0.8; }
+        .img-wrap { width: 100%; aspect-ratio: 0.8; overflow: hidden; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card-body { padding: 12px; }
+        .card-name { font-size: 13px; font-weight: 300; opacity: 0.9; }
+        .card-price { font-size: 14px; font-weight: 600; margin-top: 4px; }
 
-        /* Grid */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .card { background: var(--glass); backdrop-filter: blur(15px); border-radius: 28px; overflow: hidden; position: relative; box-shadow: inset 0 0 0 0.5px var(--hairline); transition: transform 0.2s; }
-        .card:active { transform: scale(0.97); }
-        .img-wrap { width: 100%; aspect-ratio: 0.75; overflow: hidden; background: #0a0a0a; }
-        .card img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease; }
-        .card-body { padding: 14px; }
-        .card-cat { font-size: 9px; opacity: 0.4; text-transform: uppercase; letter-spacing: 1.5px; }
-        .card-name { font-size: 14px; font-weight: 300; margin: 4px 0 6px; }
-        .card-price { font-size: 15px; font-weight: 400; }
-
-        /* Modal Product */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: none; flex-direction: column; animation: ios-slide 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
-        @keyframes ios-slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .modal-header { 
-            position: sticky; top: 0; z-index: 10;
-            padding: calc(env(safe-area-inset-top) + 15px) 20px 15px; 
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.1);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border-bottom: 0.5px solid var(--hairline);
+        /* --- MODAL PRODUCT CARD (iOS 26 Style) --- */
+        .modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 2000; display: none; flex-direction: column;
+            animation: modalSlide 0.5s cubic-bezier(0.32, 0.72, 0, 1);
         }
-        .close-btn { background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 400; }
+        @keyframes modalSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .modal-body { padding: 0 0 120px; overflow-y: auto; flex: 1; }
-        .product-info-padding { padding: 25px 20px; }
+        /* Mirror Header */
+        .modal-header {
+            position: absolute; top: 0; width: 100%; z-index: 100;
+            padding: calc(env(safe-area-inset-top) + 10px) 20px 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: background 0.3s, backdrop-filter 0.3s;
+        }
+        .modal-header.scrolled {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 0.5px solid var(--glass-border);
+        }
+        .back-btn {
+            width: 32px; height: 32px; background: rgba(255,255,255,0.1); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
 
-        /* Slider */
-        .slider-container { width: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-        .slider-container::-webkit-scrollbar { display: none; }
-        .slider-item { min-width: 100%; scroll-snap-align: start; aspect-ratio: 0.8; overflow: hidden; }
-        .slider-item img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-content { overflow-y: auto; height: 100%; padding-bottom: 150px; scroll-behavior: smooth; }
 
-        /* Controls */
-        .size-btn { flex: 1; padding: 15px; border-radius: 16px; background: var(--glass); border: 1px solid var(--hairline); text-align: center; color: #fff; }
-        .size-btn.active { background: #fff; color: #000; font-weight: 600; }
+        /* Gallery */
+        .gallery-container { position: relative; width: 100%; aspect-ratio: 0.85; }
+        .gallery-scroll { 
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory; 
+            height: 100%; scrollbar-width: none;
+        }
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+        .gallery-item { min-width: 100%; scroll-snap-align: start; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .gallery-dots {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px; padding: 6px 10px; background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px); border-radius: 20px;
+        }
+        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
+        .dot.active { background: #fff; width: 12px; border-radius: 4px; }
 
-        .buy-btn-fixed { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 20px; right: 20px; z-index: 100; }
-        .btn-main { width: 100%; padding: 20px; border-radius: 24px; background: #fff; color: #000; border: none; font-size: 17px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* Product Details */
+        .details-box { padding: 30px 24px; }
+        .product-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .product-desc { font-size: 16px; line-height: 1.5; opacity: 0.6; font-weight: 300; margin-bottom: 30px; }
+
+        .size-selector { display: flex; gap: 12px; margin-top: 15px; }
+        .size-chip { 
+            flex: 1; padding: 16px; border-radius: 18px; background: var(--glass);
+            border: 0.5px solid var(--glass-border); text-align: center; font-size: 14px; transition: 0.2s;
+        }
+        .size-chip.active { background: #fff; color: #000; font-weight: 600; }
+
+        /* Floating Bottom Bar */
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            padding: 20px 24px calc(env(safe-area-inset-bottom) + 15px);
+            background: linear-gradient(to top, #000 70%, transparent);
+            z-index: 110;
+        }
+        .main-btn {
+            width: 100%; padding: 20px; border-radius: 22px; background: #fff;
+            color: #000; border: none; font-size: 17px; font-weight: 600;
+            display: flex; justify-content: space-between; align-items: center;
+        }
 
         /* Checkout Sheet */
-        .checkout-sheet { position: fixed; bottom: 0; left: 0; width: 100%; background: #1c1c1e; border-radius: 30px 30px 0 0; z-index: 3000; padding: 25px 20px calc(env(safe-area-inset-bottom) + 20px); display: none; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
-        .checkout-sheet.active { display: block; transform: translateY(0); }
-        .sheet-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: -10px auto 20px; }
-        
-        .qty-control { display: flex; align-items: center; gap: 20px; background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 15px; }
-        .qty-btn { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
-
-        .input-ios { width: 100%; background: rgba(255,255,255,0.05); border: none; border-radius: 12px; padding: 16px; color: #fff; font-size: 16px; margin: 15px 0; }
-
-        /* Payment Simulation */
-        #payment-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(20px);
-            z-index: 4000; display: none; align-items: center; justify-content: center; flex-direction: column;
+        .sheet {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: auto;
+            background: #1c1c1e; border-radius: 32px 32px 0 0; z-index: 3000;
+            padding: 20px 24px calc(env(safe-area-inset-bottom) + 20px);
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
         }
-        .apple-pay-status { text-align: center; }
-        .face-id-ring { width: 80px; height: 80px; border: 2px solid var(--ios-blue); border-radius: 20px; margin-bottom: 20px; position: relative; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-        
-        /* Dock */
-        .dock-container { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 50%; transform: translateX(-50%); z-index: 1000; }
-        .dock { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(35px) saturate(1.5); padding: 12px 35px; border-radius: 40px; display: flex; gap: 45px; box-shadow: inset 0 0 0 0.5px var(--hairline); }
-        .dock-item { display: flex; flex-direction: column; align-items: center; opacity: 0.35; }
-        .dock-item.active { opacity: 1; }
-        .dock-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
-        .dock-item span { font-size: 9px; }
+        .sheet.active { transform: translateY(0); }
+        .sheet-handle { width: 36px; height: 5px; background: rgba(255,255,255,0.15); border-radius: 10px; margin: 0 auto 25px; }
+
+        /* Apple Pay Simulation */
+        .pay-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 5000; display: none;
+            align-items: center; justify-content: center; flex-direction: column;
+        }
+        .faceid-node {
+            width: 70px; height: 70px; border: 2px solid #007AFF; border-radius: 18px;
+            margin-bottom: 20px; position: relative;
+        }
+        .faceid-node::before {
+            content: ''; position: absolute; inset: 10px; border: 2px solid #007AFF; border-radius: 8px;
+            animation: scan 2s infinite ease-in-out;
+        }
+        @keyframes scan { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
+
+        .input-ios {
+            width: 100%; background: rgba(255,255,255,0.06); border: none;
+            border-radius: 16px; padding: 18px; color: #fff; font-size: 16px; margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -117,101 +152,95 @@
 
 <div class="app">
     <header>
-        <img src="kriss.png" class="logo-img" alt="KRISS">
+        <div style="font-size: 22px; font-weight: 700; letter-spacing: -1px;">KRISS</div>
     </header>
-
-    <div class="nav-container">
-        <div class="nav-capsule">
-            <div class="nav-item active" onclick="setCat('все', this)">Все</div>
-            <div class="nav-item" onclick="setCat('белье', this)">Белье</div>
-            <div class="nav-item" onclick="setCat('пижамы', this)">Пижамы</div>
-            <div class="nav-item" onclick="setCat('халаты', this)">Халаты</div>
-        </div>
-    </div>
 
     <div class="grid" id="catalog"></div>
 </div>
 
-<!-- Product Modal -->
+<!-- Modal Product -->
 <div id="modal" class="modal">
-    <div class="modal-header">
-        <div class="close-btn" onclick="closeModal()">Закрыть</div>
-        <div style="font-weight: 500; font-size: 15px;">Товар</div>
-        <div style="width: 60px;"></div>
+    <div class="modal-header" id="modal-header">
+        <div class="back-btn" onclick="closeModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div id="header-title" style="opacity: 0; font-weight: 600; font-size: 15px;">Изделие</div>
+        <div style="width: 32px;"></div>
     </div>
-    <div class="modal-body" id="modal-content"></div>
-    <div class="buy-btn-fixed">
-        <button class="btn-main" id="open-checkout-btn">Купить</button>
+
+    <div class="modal-content" id="modal-scroll" onscroll="handleScroll(this)">
+        <div class="gallery-container">
+            <div class="gallery-scroll" id="gallery" onscroll="updateDots(this)">
+                <!-- Images via JS -->
+            </div>
+            <div class="gallery-dots" id="dots"></div>
+        </div>
+
+        <div class="details-box" id="product-details">
+            <!-- Details via JS -->
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <button class="main-btn" onclick="openCheckout()">
+            <span>Добавить в корзину</span>
+            <span id="btn-price"></span>
+        </button>
     </div>
 </div>
 
 <!-- Checkout Sheet -->
-<div id="checkout-sheet" class="checkout-sheet">
+<div id="sheet" class="sheet">
     <div class="sheet-handle"></div>
-    <h3 style="margin-bottom: 20px; font-weight: 500;">Оформление заказа</h3>
+    <h2 style="font-size: 24px; margin-bottom: 20px;">Оформление</h2>
     
-    <div id="checkout-item-info" style="display: flex; gap: 15px; margin-bottom: 25px;">
-        <!-- Filled by JS -->
-    </div>
-
-    <div style="margin-bottom: 20px;">
-        <p style="font-size: 13px; opacity: 0.5; margin-bottom: 10px;">АДРЕС ДОСТАВКИ (КРАСНОЯРСК)</p>
-        <input type="text" class="input-ios" placeholder="Улица, дом, квартира" id="addr-input" value="ул. Ленина, д. 1">
-    </div>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <span style="opacity: 0.6;">Количество</span>
-        <div class="qty-control">
-            <div class="qty-btn" onclick="updateQty(-1)">−</div>
-            <span id="qty-val" style="font-weight: 600;">1</span>
-            <div class="qty-btn" onclick="updateQty(1)">+</div>
+    <div style="display: flex; gap: 15px; background: rgba(255,255,255,0.04); padding: 15px; border-radius: 20px;">
+        <img id="sheet-img" src="" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover;">
+        <div>
+            <div id="sheet-name" style="font-weight: 600;"></div>
+            <div style="opacity: 0.5; font-size: 14px; margin-top: 4px;">Размер: S (Стандарт)</div>
         </div>
     </div>
 
-    <button class="btn-main" style="background: #fff; color: #000;" onclick="startPayment()">Оплатить <span id="total-price"></span></button>
-    <button class="btn-main" style="background: transparent; color: #fff; margin-top: 10px; box-shadow: none;" onclick="closeCheckout()">Отмена</button>
+    <input type="text" class="input-ios" placeholder="Адрес в Красноярске" id="addr" value="ул. Мира, 10">
+
+    <div style="display: flex; justify-content: space-between; margin: 10px 0 30px;">
+        <span style="opacity: 0.6;">Итого к оплате</span>
+        <span id="sheet-total" style="font-weight: 700; font-size: 20px;"></span>
+    </div>
+
+    <button class="main-btn" style="background: #fff; color: #000; justify-content: center; gap: 10px;" onclick="confirmPayment()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z"/></svg>
+        Оплатить Apple Pay
+    </button>
 </div>
 
-<!-- Payment Overlay -->
-<div id="payment-overlay">
-    <div class="apple-pay-status">
-        <div class="face-id-ring" id="pay-icon"></div>
-        <h2 id="pay-text" style="font-weight: 400; letter-spacing: -0.5px;">Face ID</h2>
-        <p id="pay-subtext" style="opacity: 0.5; margin-top: 8px;">Двойное нажатие для оплаты</p>
-    </div>
-</div>
-
-<div class="dock-container">
-    <div class="dock">
-        <div class="dock-item active" onclick="location.reload()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.2"/></svg><span>МАГАЗИН</span></div>
-        <div class="dock-item" onclick="tg.showAlert('Поиск скоро появится')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="1.2"/></svg><span>ПОИСК</span></div>
-        <div class="dock-item" onclick="tg.showAlert('Избранное в разработке')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.2"/></svg><span>ЛЮБИМОЕ</span></div>
-    </div>
+<!-- Apple Pay Simulation -->
+<div class="pay-overlay" id="pay-overlay">
+    <div class="faceid-node"></div>
+    <div style="font-size: 20px; font-weight: 500; margin-bottom: 5px;">Face ID</div>
+    <div style="opacity: 0.5; font-size: 14px;">Двойное нажатие для подтверждения</div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-    tg.backgroundColor = '#000000';
-    tg.headerColor = '#000000';
 
     const DATA = [
-        { id: 1, cat: 'белье', name: "Lace Noir Set", price: 8500, img: "photo1.jpg", desc: "Сексуальное черное кружево ручной работы. Итальянские материалы, безупречная посадка." },
-        { id: 2, cat: 'пижамы', name: "Silk Pearl Gown", price: 12900, img: "photo2.jpg", desc: "Натуральный шелк в жемчужном оттенке. Невесомая роскошь для ваших вечеров." },
-        { id: 3, cat: 'белье', name: "Passion Body", price: 7400, img: "photo3.jpg", desc: "Элегантное боди с открытой спиной. Подчеркивает изгибы тела." },
-        { id: 4, cat: 'халаты', name: "Midnight Kimono", price: 15600, img: "photo4.jpg", desc: "Халат из тяжелого премиального шелка. Глубокий черный цвет Noir." }
+        { id: 1, cat: 'белье', name: "Silk Noir Set", price: 8900, imgs: ["photo1.jpg", "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=800", "https://images.unsplash.com/photo-1581333100576-b73bbebd3c2e?w=800"], desc: "Премиальный шелк и французское кружево. Коллекция Noir 2026." },
+        { id: 2, cat: 'пижамы', name: "Pearl Satin", price: 11500, imgs: ["photo2.jpg", "https://images.unsplash.com/photo-1598554747436-c9293d6a588f?w=800"], desc: "Атласная пижама в жемчужном оттенке. Идеально для отдыха." },
+        { id: 3, cat: 'белье', name: "Velvet Body", price: 7200, imgs: ["photo3.jpg", "https://images.unsplash.com/photo-1610384029267-3930d99bc361?w=800"], desc: "Бархатное боди с глубоким вырезом. Подчеркивает силуэт." },
+        { id: 4, cat: 'халаты', name: "Royal Kimono", price: 14900, imgs: ["photo4.jpg", "https://images.unsplash.com/photo-1566206091558-7f218b696731?w=800"], desc: "Тяжелый шелк, ручная вышивка на спине. Лимитированная серия." }
     ];
 
-    let currentProduct = null;
-    let currentQty = 1;
+    let currentItem = null;
 
-    function render(list) {
+    function renderCatalog() {
         const catalog = document.getElementById('catalog');
-        catalog.innerHTML = list.map(p => `
+        catalog.innerHTML = DATA.map(p => `
             <div class="card" onclick="openProduct(${p.id})">
-                <div class="img-wrap"><img src="${p.img}" onload="this.style.opacity=1" onerror="this.src='https://images.unsplash.com/photo-1581333100576-b73bbebd3c2e?q=80&w=800'"></div>
+                <div class="img-wrap"><img src="${p.imgs[0]}" onerror="this.src='https://via.placeholder.com/400x500/111/111'"></div>
                 <div class="card-body">
-                    <div class="card-cat">${p.cat}</div>
                     <div class="card-name">${p.name}</div>
                     <div class="card-price">${p.price.toLocaleString()} ₽</div>
                 </div>
@@ -220,106 +249,94 @@
     }
 
     function openProduct(id) {
-        currentProduct = DATA.find(x => x.id === id);
-        currentQty = 1;
+        currentItem = DATA.find(x => x.id === id);
         
-        document.getElementById('modal-content').innerHTML = `
-            <div class="slider-container">
-                <div class="slider-item"><img src="${currentProduct.img}" onerror="this.src='https://images.unsplash.com/photo-1581333100576-b73bbebd3c2e?q=80&w=800'"></div>
-                <div class="slider-item"><img src="https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?q=80&w=800" style="filter:grayscale(1)"></div>
-                <div class="slider-item"><img src="${currentProduct.img}" style="transform: scaleX(-1)"></div>
-            </div>
-            <div class="product-info-padding">
-                <h2 style="font-weight:300; font-size:32px; margin-bottom:12px; letter-spacing:-1px;">${currentProduct.name}</h2>
-                <p style="opacity:0.5; font-weight:300; line-height:1.6; margin-bottom:30px; font-size:15px;">${currentProduct.desc}</p>
-                
-                <p style="font-size:11px; opacity:0.4; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">Размер</p>
-                <div style="display:flex; gap:10px; margin-bottom:40px;">
-                    <div class="size-btn active" onclick="selSize(this)">S</div>
-                    <div class="size-btn" onclick="selSize(this)">M</div>
-                    <div class="size-btn" onclick="selSize(this)">L</div>
-                </div>
+        // Gallery
+        const gallery = document.getElementById('gallery');
+        gallery.innerHTML = currentItem.imgs.map(img => `
+            <div class="gallery-item"><img src="${img}" onerror="this.src='https://via.placeholder.com/800x1000/111/111'"></div>
+        `).join('');
+
+        // Dots
+        const dots = document.getElementById('dots');
+        dots.innerHTML = currentItem.imgs.map((_, i) => `<div class="dot ${i===0?'active':''}"></div>`).join('');
+
+        // Details
+        document.getElementById('product-details').innerHTML = `
+            <h1 class="product-title">${currentItem.name}</h1>
+            <p class="product-desc">${currentItem.desc}</p>
+            
+            <div style="font-size: 12px; opacity: 0.4; text-transform: uppercase; letter-spacing: 1px;">Выберите размер</div>
+            <div class="size-selector">
+                <div class="size-chip active" onclick="selectSize(this)">S</div>
+                <div class="size-chip" onclick="selectSize(this)">M</div>
+                <div class="size-chip" onclick="selectSize(this)">L</div>
             </div>
         `;
-        
-        document.getElementById('open-checkout-btn').onclick = openCheckout;
+
+        document.getElementById('btn-price').innerText = currentItem.price.toLocaleString() + ' ₽';
         document.getElementById('modal').style.display = 'flex';
         tg.HapticFeedback.impactOccurred('medium');
     }
 
-    function openCheckout() {
-        const sheet = document.getElementById('checkout-sheet');
-        document.getElementById('checkout-item-info').innerHTML = `
-            <img src="${currentProduct.img}" style="width:60px; height:60px; border-radius:12px; object-fit:cover;">
-            <div>
-                <div style="font-weight:500;">${currentProduct.name}</div>
-                <div style="opacity:0.5; font-size:14px;">${currentProduct.price.toLocaleString()} ₽</div>
-            </div>
-        `;
-        updateQty(0);
-        sheet.style.display = 'block';
-        setTimeout(() => sheet.classList.add('active'), 10);
-        tg.HapticFeedback.impactOccurred('light');
+    function handleScroll(el) {
+        const header = document.getElementById('modal-header');
+        const title = document.getElementById('header-title');
+        if (el.scrollTop > 100) {
+            header.classList.add('scrolled');
+            title.style.opacity = "1";
+        } else {
+            header.classList.remove('scrolled');
+            title.style.opacity = "0";
+        }
     }
 
-    function updateQty(delta) {
-        currentQty = Math.max(1, currentQty + delta);
-        document.getElementById('qty-val').innerText = currentQty;
-        document.getElementById('total-price').innerText = `— ${(currentProduct.price * currentQty).toLocaleString()} ₽`;
-        if (delta !== 0) tg.HapticFeedback.selectionChanged();
+    function updateDots(el) {
+        const index = Math.round(el.scrollLeft / el.offsetWidth);
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
     }
 
-    function closeCheckout() {
-        const sheet = document.getElementById('checkout-sheet');
-        sheet.classList.remove('active');
-        setTimeout(() => sheet.style.display = 'none', 400);
-    }
-
-    function startPayment() {
-        const overlay = document.getElementById('payment-overlay');
-        overlay.style.display = 'flex';
-        
-        // Симуляция FaceID
-        setTimeout(() => {
-            tg.HapticFeedback.impactOccurred('heavy');
-            document.getElementById('pay-text').innerText = "Подтверждено";
-            document.getElementById('pay-icon').style.borderColor = "#4BB543";
-            document.getElementById('pay-icon').innerHTML = `<div style="color:#4BB543; font-size:40px; display:flex; justify-content:center; align-items:center; height:100%">✓</div>`;
-            
-            setTimeout(() => {
-                document.getElementById('pay-text').innerText = "Обработка...";
-                document.getElementById('pay-icon').innerHTML = "";
-                document.getElementById('pay-icon').classList.add('loader-spin'); // Можно добавить стиль спиннера
-                
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                    tg.HapticFeedback.notificationOccurred('success');
-                    tg.showAlert("Заказ успешно оплачен! Доставка в Красноярске ожидается в течение 2 часов.");
-                    closeCheckout();
-                    closeModal();
-                }, 2000);
-            }, 1000);
-        }, 1500);
-    }
-
-    function closeModal() { 
-        document.getElementById('modal').style.display = 'none'; 
-    }
-
-    function selSize(el) {
-        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+    function selectSize(el) {
+        document.querySelectorAll('.size-chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         tg.HapticFeedback.selectionChanged();
     }
 
-    function setCat(cat, el) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        render(cat === 'все' ? DATA : DATA.filter(p => p.cat === cat));
+    function openCheckout() {
+        document.getElementById('sheet-img').src = currentItem.imgs[0];
+        document.getElementById('sheet-name').innerText = currentItem.name;
+        document.getElementById('sheet-total').innerText = currentItem.price.toLocaleString() + ' ₽';
+        document.getElementById('sheet').classList.add('active');
         tg.HapticFeedback.impactOccurred('light');
     }
 
-    // Sakura Engine
+    function confirmPayment() {
+        document.getElementById('pay-overlay').style.display = 'flex';
+        tg.HapticFeedback.impactOccurred('heavy');
+
+        setTimeout(() => {
+            document.getElementById('pay-overlay').innerHTML = `
+                <div style="color: #4BB543; font-size: 60px;">✓</div>
+                <div style="font-size: 20px; margin-top: 10px;">Оплачено</div>
+            `;
+            tg.HapticFeedback.notificationOccurred('success');
+            
+            setTimeout(() => {
+                document.getElementById('pay-overlay').style.display = 'none';
+                document.getElementById('sheet').classList.remove('active');
+                closeModal();
+                tg.showAlert("Заказ принят! Мы свяжемся с вами для уточнения времени доставки.");
+            }, 1500);
+        }, 2000);
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('sheet').classList.remove('active');
+    }
+
+    // Sakura Animation
     const canvas = document.getElementById('sakura');
     const ctx = canvas.getContext('2d');
     let petals = [];
@@ -327,14 +344,14 @@
     window.addEventListener('resize', resize); resize();
     class Petal {
         constructor() { this.init(); }
-        init() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height - canvas.height; this.size = Math.random() * 2 + 1; this.speed = Math.random() * 0.3 + 0.1; this.opacity = Math.random() * 0.15 + 0.05; }
-        update() { this.y += this.speed; this.x += Math.sin(this.y / 100) * 0.2; if (this.y > canvas.height) this.init(); }
+        init() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height - canvas.height; this.size = Math.random() * 2 + 1; this.speed = Math.random() * 0.5 + 0.2; this.opacity = Math.random() * 0.3 + 0.1; }
+        update() { this.y += this.speed; this.x += Math.sin(this.y / 100) * 0.3; if (this.y > canvas.height) this.init(); }
         draw() { ctx.beginPath(); ctx.ellipse(this.x, this.y, this.size, this.size/2, Math.PI/4, 0, Math.PI * 2); ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`; ctx.fill(); }
     }
-    for (let i = 0; i < 25; i++) petals.push(new Petal());
+    for (let i = 0; i < 30; i++) petals.push(new Petal());
     function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); petals.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
     
-    render(DATA); 
+    renderCatalog();
     animate();
 </script>
 
