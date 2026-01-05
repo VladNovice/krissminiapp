@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KRISS — Store</title>
-    <!-- Telegram Web App Script -->
+    <title>KRISS Luxury App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --accent-pink: #f8bbd0;
-            --text-main: #1d1d1f;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --sakura: #ffb7c5;
         }
 
         * {
@@ -24,36 +21,28 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: linear-gradient(135deg, #fce4ec 0%, #ffffff 50%, #e1f5fe 100%);
-            background-attachment: fixed;
-            min-height: 100vh;
-            color: var(--text-main);
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* Анимированный фон (эффект iOS 26) */
-        body::before {
-            content: '';
+        /* Sakura Canvas */
+        #sakura-canvas {
             position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(248, 187, 208, 0.4) 0%, transparent 40%);
-            animation: rotate 20s linear infinite;
-            z-index: -1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Контейнер */
-        .app-container {
+        .content {
+            position: relative;
+            z-index: 1;
             padding: 20px;
-            padding-bottom: 100px;
             max-width: 500px;
             margin: 0 auto;
         }
@@ -63,380 +52,242 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 10px 5px;
+            padding: 20px 0 40px;
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 200;
-            letter-spacing: 6px;
+            font-weight: 100;
+            font-size: 28px;
+            letter-spacing: 12px;
             text-transform: uppercase;
+            background: linear-gradient(to right, #fff, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .cart-icon {
-            position: relative;
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            padding: 10px 15px;
-            border-radius: 20px;
+        /* Glass Elements */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
             border: 1px solid var(--glass-border);
-            font-size: 14px;
-        }
-
-        /* Главный баннер */
-        .hero {
-            position: relative;
-            width: 100%;
-            height: 220px;
-            border-radius: 35px;
+            border-radius: 30px;
             overflow: hidden;
-            margin-bottom: 30px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        /* Hero */
+        .hero {
+            height: 350px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 30px;
         }
 
         .hero img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .hero-caption {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.7;
         }
 
-        /* Категории */
-        .categories {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 15px;
-            scrollbar-width: none;
-        }
-        .categories::-webkit-scrollbar { display: none; }
-
-        .cat-chip {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            padding: 8px 20px;
-            border-radius: 100px;
-            border: 1px solid var(--glass-border);
-            white-space: nowrap;
-            font-size: 13px;
-            font-weight: 400;
+        .hero-info h1 {
+            font-weight: 300;
+            font-size: 32px;
+            margin-bottom: 8px;
         }
 
-        /* Сетка товаров */
-        .product-grid {
+        /* Grid */
+        .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
 
-        .product-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 10px;
-            border: 1px solid var(--glass-border);
-            transition: transform 0.3s ease;
-        }
-
-        .product-card:active {
-            transform: scale(0.96);
+        .product {
+            padding-bottom: 15px;
         }
 
         .product-img {
             width: 100%;
-            aspect-ratio: 3/4;
-            border-radius: 22px;
+            aspect-ratio: 0.8;
+            border-radius: 25px;
             object-fit: cover;
-            margin-bottom: 10px;
+            border: 1px solid var(--glass-border);
         }
 
-        .product-info {
-            padding: 5px;
-        }
-
-        .product-title {
-            font-size: 14px;
-            font-weight: 400;
-            margin-bottom: 4px;
-            opacity: 0.8;
+        .product-name {
+            font-size: 13px;
+            font-weight: 300;
+            margin: 12px 0 4px 8px;
+            color: rgba(255,255,255,0.6);
         }
 
         .product-price {
             font-size: 16px;
-            font-weight: 500;
+            margin-left: 8px;
+            font-weight: 400;
         }
 
-        /* Навигация (Bottom Bar) */
-        .bottom-nav {
+        /* Bottom Nav */
+        nav {
             position: fixed;
-            bottom: 25px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(25px);
-            border-radius: 35px;
+            width: 80%;
+            background: rgba(15, 15, 15, 0.7);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 40px;
+            padding: 18px;
             display: flex;
             justify-content: space-around;
-            padding: 15px;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            z-index: 100;
         }
 
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 10px;
-            opacity: 0.5;
-            transition: 0.3s;
+            width: 24px;
+            height: 24px;
+            opacity: 0.4;
         }
 
-        .nav-item.active {
-            opacity: 1;
+        .nav-item.active { opacity: 1; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 0; }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .nav-icon {
-            font-size: 20px;
-            margin-bottom: 4px;
+        .content > * {
+            animation: fadeIn 1s ease forwards;
         }
-
-        /* Кнопка AI */
-        .ai-crystal {
-            position: fixed;
-            right: 20px;
-            bottom: 100px;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #e0f2f1, #f8bbd0);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 10px 20px rgba(248, 187, 208, 0.4);
-            border: 2px solid white;
-            z-index: 99;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* Модальное окно */
-        #product-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(30px);
-            z-index: 200;
-            padding: 30px 20px;
-            animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .close-modal {
-            float: right;
-            font-size: 30px;
-            font-weight: 200;
-        }
-
-        .modal-content img {
-            width: 100%;
-            border-radius: 40px;
-            margin: 20px 0;
-        }
-
-        .buy-btn {
-            width: 100%;
-            background: var(--text-main);
-            color: white;
-            border: none;
-            padding: 20px;
-            border-radius: 25px;
-            font-size: 18px;
-            margin-top: 20px;
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<canvas id="sakura-canvas"></canvas>
+
+<div class="content">
     <header>
         <div class="logo">KRISS</div>
-        <div class="cart-icon" onclick="showCart()">
-            🛒 <span id="cart-count">0</span>
-        </div>
+        <div style="font-weight: 100; font-size: 14px; opacity: 0.5;">RU • EN</div>
     </header>
 
-    <div class="hero">
-        <img src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=800" alt="New Collection">
-        <div class="hero-caption">
-            <h2 style="font-weight: 200; font-size: 28px;">Silk & Peace</h2>
-            <p style="font-size: 12px; opacity: 0.8; letter-spacing: 2px;">COLLECTION 2026</p>
+    <div class="glass-card hero" onclick="vibrate()">
+        <img src="https://images.unsplash.com/photo-1515377662630-cd03bc627824?q=80&w=800" alt="Silk">
+        <div class="hero-info">
+            <h1>Silk Obsession</h1>
+            <p style="opacity: 0.5; font-size: 14px; letter-spacing: 1px;">EXCLUSIVE COLLECTION '26</p>
         </div>
     </div>
 
-    <div class="categories">
-        <div class="cat-chip" style="background: white;">Все</div>
-        <div class="cat-chip">Пижамы</div>
-        <div class="cat-chip">Белье</div>
-        <div class="cat-chip">Аксессуары</div>
-        <div class="cat-chip">Sale</div>
-    </div>
-
-    <div class="product-grid" id="catalog">
-        <!-- Товары генерятся скриптом -->
+    <div class="grid">
+        <div class="product" onclick="vibrate()">
+            <div class="glass-card">
+                <img src="https://images.unsplash.com/photo-1618331835717-801697a54139?q=80&w=400" class="product-img">
+            </div>
+            <div class="product-name">Noir Nightgown</div>
+            <div class="product-price">12 400 ₽</div>
+        </div>
+        <div class="product" onclick="vibrate()">
+            <div class="glass-card">
+                <img src="https://images.unsplash.com/photo-1590553231454-046603a1215b?q=80&w=400" class="product-img">
+            </div>
+            <div class="product-name">Rose Petal Set</div>
+            <div class="product-price">8 900 ₽</div>
+        </div>
     </div>
 </div>
 
-<div class="ai-crystal" onclick="openAI()">
-    ✨
-</div>
-
-<nav class="bottom-nav">
-    <div class="nav-item active">
-        <div class="nav-icon">✦</div>
-        <div>Shop</div>
-    </div>
-    <div class="nav-item">
-        <div class="nav-icon">♡</div>
-        <div>Loves</div>
-    </div>
-    <div class="nav-item">
-        <div class="nav-icon">○</div>
-        <div>Account</div>
-    </div>
+<nav>
+    <svg class="nav-item active" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+    <svg class="nav-item" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+    <svg class="nav-item" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
 </nav>
 
-<!-- Modal -->
-<div id="product-modal">
-    <span class="close-modal" onclick="closeModal()">×</span>
-    <div class="modal-content" id="modal-body">
-        <!-- Content -->
-    </div>
-</div>
-
 <script>
-    // Инициализация Telegram WebApp
     const tg = window.Telegram.WebApp;
     tg.expand();
-    tg.headerColor = '#fce4ec';
+    tg.backgroundColor = '#000000';
+    tg.headerColor = '#000000';
 
-    const products = [
-        {
-            id: 1,
-            name: "Детский комплект пижамы",
-            price: 3590,
-            img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=500",
-            desc: "Рубашка с перьями, маечка и шортики. Срок пошива 7 дней."
-        },
-        {
-            id: 2,
-            name: "Шелковая комбинация",
-            price: 5200,
-            img: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=500",
-            desc: "Идеальный пудровый оттенок. Натуральный шелк."
-        },
-        {
-            id: 3,
-            name: "Бюстье Lace Pink",
-            price: 2800,
-            img: "https://images.unsplash.com/photo-1582533075130-993da3620986?auto=format&fit=crop&q=80&w=500",
-            desc: "Французское кружево, ручная работа."
-        },
-        {
-            id: 4,
-            name: "Халат Silk Dream",
-            price: 7500,
-            img: "https://images.unsplash.com/photo-1623091411395-09e79fdbfcf3?auto=format&fit=crop&q=80&w=500",
-            desc: "Длина миди, широкие рукава."
+    function vibrate() {
+        tg.HapticFeedback.impactOccurred('light');
+    }
+
+    // Sakura Animation Engine
+    const canvas = document.getElementById('sakura-canvas');
+    const ctx = canvas.getContext('2d');
+    let petals = [];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Petal {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height - canvas.height;
+            this.size = Math.random() * 7 + 2;
+            this.speed = Math.random() * 1 + 0.5;
+            this.angle = Math.random() * 360;
+            this.spin = Math.random() * 2 - 1;
+            this.blur = Math.random() * 3;
+            this.opacity = Math.random() * 0.5 + 0.2;
         }
-    ];
 
-    let cart = [];
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle * Math.PI / 180);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
+            ctx.shadowBlur = this.blur;
+            ctx.shadowColor = 'white';
+            ctx.fill();
+            ctx.restore();
+        }
 
-    function renderCatalog() {
-        const catalog = document.getElementById('catalog');
-        catalog.innerHTML = products.map(p => `
-            <div class="product-card" onclick="openProduct(${p.id})">
-                <img src="${p.img}" class="product-img">
-                <div class="product-info">
-                    <div class="product-title">${p.name}</div>
-                    <div class="product-price">${p.price} ₽</div>
-                </div>
-            </div>
-        `).join('');
+        update() {
+            this.y += this.speed;
+            this.x += Math.sin(this.y / 50);
+            this.angle += this.spin;
+            if (this.y > canvas.height) {
+                this.y = -10;
+                this.x = Math.random() * canvas.width;
+            }
+        }
     }
 
-    function openProduct(id) {
-        const p = products.find(x => x.id === id);
-        const modal = document.getElementById('product-modal');
-        const body = document.getElementById('modal-body');
-        
-        body.innerHTML = `
-            <img src="${p.img}">
-            <h2 style="font-weight:300">${p.name}</h2>
-            <p style="margin: 15px 0; opacity: 0.6; line-height: 1.6;">${p.desc}</p>
-            <div style="font-size: 24px; font-weight: 500;">${p.price} ₽</div>
-            <button class="buy-btn" onclick="addToCart(${p.id})">Добавить в корзину</button>
-        `;
-        modal.style.display = 'block';
-        tg.HapticFeedback.impactOccurred('medium');
+    function initSakura() {
+        for (let i = 0; i < 50; i++) {
+            petals.push(new Petal());
+        }
     }
 
-    function closeModal() {
-        document.getElementById('product-modal').style.display = 'none';
-    }
-
-    function addToCart(id) {
-        cart.push(id);
-        document.getElementById('cart-count').innerText = cart.length;
-        closeModal();
-        tg.HapticFeedback.notificationOccurred('success');
-        
-        // Показываем главную кнопку Telegram
-        tg.MainButton.setText('ОФОРМИТЬ ЗАКАЗ');
-        tg.MainButton.show();
-        tg.MainButton.setParams({
-            color: '#1d1d1f',
-            text_color: '#ffffff'
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        petals.forEach(p => {
+            p.update();
+            p.draw();
         });
+        requestAnimationFrame(animate);
     }
 
-    tg.onEvent('mainButtonClicked', function() {
-        tg.showConfirm("Перейти к оплате " + cart.length + " товаров?");
-    });
-
-    function openAI() {
-        tg.showAlert("Привет! Я KRISS AI. Напиши свои параметры (ОГ, ОТ, ОБ), и я подберу размер за 2 секунды ✨");
-    }
-
-    // Инициализация
-    renderCatalog();
+    initSakura();
+    animate();
 </script>
 
 </body>
