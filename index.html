@@ -25,7 +25,7 @@
         body {
             background: var(--bg);
             color: #fff;
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
@@ -37,7 +37,6 @@
             pointer-events: none;
         }
 
-        /* App Layout */
         .app {
             position: relative;
             z-index: 1;
@@ -50,8 +49,9 @@
             padding: 10px 0 25px 4px;
         }
 
+        /* Логотип кодом (SVG) - всегда загрузится */
         .logo-svg {
-            height: 28px;
+            height: 24px;
             fill: #fff;
         }
 
@@ -84,7 +84,7 @@
             font-size: 13px;
             font-weight: 300;
             color: rgba(255, 255, 255, 0.4);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: 0.3s;
         }
 
         .nav-btn.active {
@@ -109,29 +109,29 @@
             box-shadow: inset 0 0 0 0.5px var(--hairline);
         }
 
-        .card:active { transform: scale(0.96); }
-
         .img-wrap {
             width: 100%;
             aspect-ratio: 0.8;
             border-radius: 25px;
             overflow: hidden;
-            background: linear-gradient(45deg, #111, #222); /* Плейсхолдер */
+            background: #111;
             margin-bottom: 12px;
+            position: relative;
         }
 
         .card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
         }
 
         .card-body { padding: 0 10px 10px; }
         .card-cat { font-size: 9px; font-weight: 200; opacity: 0.4; text-transform: uppercase; letter-spacing: 1.5px; }
-        .card-name { font-size: 14px; font-weight: 300; margin: 4px 0 6px; color: rgba(255,255,255,0.9); }
-        .card-price { font-size: 15px; font-weight: 400; color: #fff; }
+        .card-name { font-size: 14px; font-weight: 300; margin: 4px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-price { font-size: 15px; font-weight: 400; }
 
         /* Floating Dock */
         .dock-container {
@@ -158,12 +158,11 @@
             flex-direction: column;
             align-items: center;
             opacity: 0.35;
-            transition: 0.3s;
         }
 
         .dock-item.active { opacity: 1; }
         .dock-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
-        .dock-item span { font-size: 9px; font-weight: 300; letter-spacing: 0.5px; }
+        .dock-item span { font-size: 9px; font-weight: 300; }
 
         /* Fullscreen Modal */
         .modal {
@@ -182,7 +181,6 @@
             padding: calc(env(safe-area-inset-top) + 15px) 20px 10px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
         .close-btn {
@@ -190,18 +188,17 @@
             padding: 8px 18px;
             border-radius: 20px;
             font-size: 14px;
-            font-weight: 300;
         }
 
         .modal-body { padding: 0 20px 120px; overflow-y: auto; }
-        .modal-img-box { width: 100%; border-radius: 35px; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 0 0.5px var(--hairline); }
+        .modal-img-box { width: 100%; border-radius: 35px; overflow: hidden; margin-bottom: 25px; background: #111; }
         .modal-img-box img { width: 100%; display: block; }
 
         .size-wrap { display: flex; gap: 10px; margin: 25px 0; }
         .size-btn {
             flex: 1; padding: 18px; border-radius: 20px;
             background: var(--glass); box-shadow: inset 0 0 0 0.5px var(--hairline);
-            text-align: center; font-weight: 300;
+            text-align: center;
         }
         .size-btn.active { background: #fff; color: #000; font-weight: 500; }
 
@@ -210,7 +207,6 @@
             background: #fff; color: #000; border: none;
             font-size: 17px; font-weight: 500;
         }
-
     </style>
 </head>
 <body>
@@ -219,9 +215,8 @@
 
 <div class="app">
     <header>
-        <!-- SVG LOGO (Безотказный вариант) -->
         <svg class="logo-svg" viewBox="0 0 300 60">
-            <text x="0" y="45" font-family="Inter" font-weight="100" font-size="45" letter-spacing="15" fill="white">KRISS</text>
+            <text x="0" y="45" font-family="Inter" font-weight="100" font-size="40" letter-spacing="15" fill="white">KRISS</text>
         </svg>
     </header>
 
@@ -234,9 +229,7 @@
         </div>
     </div>
 
-    <div class="grid" id="catalog">
-        <!-- JS Injection -->
-    </div>
+    <div class="grid" id="catalog"></div>
 </div>
 
 <div class="dock-container">
@@ -245,7 +238,7 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.2"/></svg>
             <span>ВИТРИНА</span>
         </div>
-        <div class="dock-item" onclick="tg.showAlert('Поиск будет доступен в обновлении')">
+        <div class="dock-item" onclick="tg.showAlert('Поиск скоро появится')">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="1.2"/></svg>
             <span>ПОИСК</span>
         </div>
@@ -259,7 +252,7 @@
 <div id="modal" class="modal">
     <div class="modal-nav">
         <div class="close-btn" onclick="closeModal()">Назад</div>
-        <div style="font-weight: 200; letter-spacing: 2px; font-size: 13px; opacity: 0.5;">KRISS NOIR</div>
+        <div style="font-weight: 200; letter-spacing: 2px; font-size: 12px; opacity: 0.5;">KRISS NOIR</div>
         <div style="width: 60px;"></div>
     </div>
     <div class="modal-body" id="modal-content"></div>
@@ -270,22 +263,32 @@
     tg.expand();
     tg.backgroundColor = '#000000';
 
-    // Список товаров с реальными фото (Unsplash optimized)
+    // Используем максимально надежные ссылки. Если не грузятся - проверьте VPN или интернет.
     const PRODUCTS = [
-        { id: 1, cat: 'белье', name: "Lace Noir Set", price: 8500, img: "https://images.unsplash.com/photo-1582533075130-993da3620986?q=80&w=600&auto=format", desc: "Сексуальное черное кружево ручной работы. Идеальная посадка и французский шарм." },
-        { id: 2, cat: 'пижамы', name: "Silk Pearl Gown", price: 12900, img: "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=600&auto=format", desc: "Натуральный шелк в жемчужном оттенке. Невесомая роскошь для ваших ночей." },
-        { id: 3, cat: 'белье', name: "Red Passion Body", price: 7400, img: "https://images.unsplash.com/photo-1618331835717-801697a54139?q=80&w=600&auto=format", desc: "Кружевное боди в цвете спелой вишни. Подчеркивает каждую линию тела." },
-        { id: 4, cat: 'халаты', name: "Midnight Kimono", price: 15600, img: "https://images.unsplash.com/photo-1623091411395-09e79fdbfcf3?q=80&w=600&auto=format", desc: "Длинный халат из тяжелого шелка. Глубокий черный цвет и матовый блеск." },
-        { id: 5, cat: 'белье', name: "Emerald Lace", price: 9200, img: "https://images.unsplash.com/photo-1515377662630-cd03bc627824?q=80&w=600&auto=format", desc: "Изумрудное кружево и тончайшая сетка. Искусство быть собой." },
-        { id: 6, cat: 'пижамы', name: "Satin Noir Set", price: 6800, img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600&auto=format", desc: "Классическая черная пижама из премиального сатина." }
+        { id: 1, cat: 'белье', name: "Lace Noir Set", price: 8500, img: "https://images.unsplash.com/photo-1582533075130-993da3620986?w=600&q=80", desc: "Сексуальное черное кружево ручной работы. Идеальная посадка." },
+        { id: 2, cat: 'белье', name: "Silk Pearl Bra", price: 7200, img: "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80", desc: "Шелковый бюстгальтер в жемчужном оттенке." },
+        { id: 3, cat: 'белье', name: "Passion Body", price: 9400, img: "https://images.unsplash.com/photo-1618331835717-801697a54139?w=600&q=80", desc: "Кружевное боди, подчеркивающее силуэт." },
+        { id: 4, cat: 'пижамы', name: "Silk Night Gown", price: 12900, img: "https://images.unsplash.com/photo-1544441893-675973e31985?w=600&q=80", desc: "Натуральный шелк для самых нежных ночей." },
+        { id: 5, cat: 'халаты', name: "Midnight Kimono", price: 15600, img: "https://images.unsplash.com/photo-1623091411395-09e79fdbfcf3?w=600&q=80", desc: "Роскошный халат из тяжелого матового шелка." },
+        { id: 6, cat: 'пижамы', name: "Satin Noir Set", price: 6800, img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80", desc: "Классическая черная пижама." }
     ];
+
+    // Функция для обработки ошибок загрузки фото
+    function handleImgError(img) {
+        img.onerror = null;
+        // Если фото не загрузилось, ставим элегантную заглушку (серый градиент)
+        img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+        img.parentElement.style.background = "linear-gradient(45deg, #1a1a1a, #333)";
+    }
 
     function render(data) {
         const catalog = document.getElementById('catalog');
         catalog.innerHTML = data.map(p => `
             <div class="card" onclick="openProduct(${p.id})">
                 <div class="img-wrap">
-                    <img src="${p.img}" onload="this.style.opacity=1">
+                    <img src="${p.img}" 
+                         onload="this.style.opacity=1" 
+                         onerror="handleImgError(this)">
                 </div>
                 <div class="card-body">
                     <div class="card-cat">${p.cat}</div>
@@ -311,18 +314,16 @@
         
         content.innerHTML = `
             <div class="modal-img-box">
-                <img src="${p.img}">
+                <img src="${p.img}" onerror="handleImgError(this)">
             </div>
             <div class="card-cat" style="margin-bottom:8px">${p.cat}</div>
             <h2 style="font-weight: 200; font-size: 32px; margin-bottom: 12px;">${p.name}</h2>
             <p style="opacity: 0.5; font-weight: 300; line-height: 1.6; margin-bottom: 30px;">${p.desc}</p>
-            
             <div class="size-wrap">
                 <div class="size-btn active" onclick="selectSize(this)">S</div>
                 <div class="size-btn" onclick="selectSize(this)">M</div>
                 <div class="size-btn" onclick="selectSize(this)">L</div>
             </div>
-            
             <button class="buy-btn" onclick="addToCart()">Добавить — ${p.price.toLocaleString()} ₽</button>
         `;
         modal.style.display = 'flex';
@@ -335,9 +336,7 @@
         tg.HapticFeedback.selectionChanged();
     }
 
-    function closeModal() {
-        document.getElementById('modal').style.display = 'none';
-    }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
     function addToCart() {
         tg.HapticFeedback.notificationOccurred('success');
@@ -345,7 +344,7 @@
         tg.showAlert('Товар добавлен в избранное');
     }
 
-    // Sakura Engine (Zen Edition)
+    // Sakura Engine
     const canvas = document.getElementById('sakura');
     const ctx = canvas.getContext('2d');
     let petals = [];
@@ -362,31 +361,24 @@
         init() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height - canvas.height;
-            this.size = Math.random() * 2.5 + 1;
-            this.speed = Math.random() * 0.2 + 0.1;
-            this.angle = Math.random() * Math.PI * 2;
-            this.spin = Math.random() * 0.01 - 0.005;
+            this.size = Math.random() * 2 + 1;
+            this.speed = Math.random() * 0.3 + 0.1;
             this.opacity = Math.random() * 0.1 + 0.05;
         }
         update() {
             this.y += this.speed;
-            this.x += Math.sin(this.y / 100) * 0.15;
-            this.angle += this.spin;
+            this.x += Math.sin(this.y / 100) * 0.1;
             if (this.y > canvas.height) this.init();
         }
         draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.angle);
             ctx.beginPath();
-            ctx.ellipse(0, 0, this.size, this.size/2, 0, 0, Math.PI * 2);
+            ctx.ellipse(this.x, this.y, this.size, this.size/2, Math.PI/4, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
             ctx.fill();
-            ctx.restore();
         }
     }
 
-    for (let i = 0; i < 18; i++) petals.push(new Petal());
+    for (let i = 0; i < 20; i++) petals.push(new Petal());
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
