@@ -5,22 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>KRISS — Noir Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #000000;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-active: rgba(255, 255, 255, 0.08);
-            --hairline: rgba(255, 255, 255, 0.1);
+            --hairline: rgba(255, 255, 255, 0.12);
             --sakura: #ffb7c5;
+            --accent: #fff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             background: var(--bg);
@@ -30,229 +26,98 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        canvas {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
+        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 
-        .app {
-            position: relative;
-            z-index: 1;
-            padding: calc(env(safe-area-inset-top) + 10px) 16px 140px;
-            min-height: 100vh;
-        }
+        .app { position: relative; z-index: 1; padding: calc(env(safe-area-inset-top) + 10px) 16px 140px; min-height: 100vh; }
 
-        header {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 10px 0 25px 4px;
-        }
+        header { display: flex; flex-direction: column; gap: 20px; padding: 10px 0 25px 4px; }
+        .logo-img { height: 40px; width: auto; object-fit: contain; filter: brightness(0) invert(1); }
 
-        /* Реальный логотип kriss.png */
-        .logo-img {
-            height: 45px; /* Увеличенный размер */
-            width: auto;
-            object-fit: contain;
-            /* Если логотип черный, инвертируем его в белый для темной темы */
-            filter: brightness(0) invert(1); 
-        }
+        /* Navigation */
+        .nav-container { display: flex; justify-content: center; margin-bottom: 25px; position: sticky; top: calc(env(safe-area-inset-top) + 10px); z-index: 100; }
+        .nav-capsule { display: flex; background: rgba(15, 15, 15, 0.7); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 4px; border-radius: 22px; box-shadow: inset 0 0 0 0.5px var(--hairline); width: 100%; }
+        .nav-item { flex: 1; text-align: center; padding: 10px 0; border-radius: 18px; font-size: 13px; font-weight: 300; color: rgba(255, 255, 255, 0.4); transition: 0.3s; }
+        .nav-item.active { background: rgba(255, 255, 255, 0.1); color: #fff; }
 
-        .search-container {
-            display: none;
-            width: 100%;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .search-input {
-            width: 100%;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--hairline);
-            border-radius: 18px;
-            padding: 14px 18px;
-            color: #fff;
-            font-size: 16px;
-            font-family: 'Inter';
-            outline: none;
-            backdrop-filter: blur(15px);
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 25px;
-            position: sticky;
-            top: calc(env(safe-area-inset-top) + 10px);
-            z-index: 100;
-        }
-
-        .nav-capsule {
-            display: flex;
-            background: rgba(15, 15, 15, 0.7);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            padding: 4px;
-            border-radius: 22px;
-            box-shadow: inset 0 0 0 0.5px var(--hairline);
-            width: 100%;
-        }
-
-        .nav-item {
-            flex: 1;
-            text-align: center;
-            padding: 10px 0;
-            border-radius: 18px;
-            font-size: 13px;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.4);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .card {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 28px;
-            overflow: hidden;
-            transition: 0.3s;
-            box-shadow: inset 0 0 0 0.5px var(--hairline);
-            position: relative;
-        }
-
-        .img-wrap {
-            width: 100%;
-            aspect-ratio: 0.75; /* Высокое фото */
-            overflow: hidden;
-            background: #0a0a0a;
-            position: relative;
-        }
-
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-        }
-
-        /* Кнопка Любимое на карточке */
-        .fav-btn-quick {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            z-index: 5;
-            background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .fav-btn-quick.active svg {
-            fill: var(--sakura);
-            stroke: var(--sakura);
-        }
-
+        /* Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .card { background: var(--glass); backdrop-filter: blur(15px); border-radius: 28px; overflow: hidden; position: relative; box-shadow: inset 0 0 0 0.5px var(--hairline); }
+        .img-wrap { width: 100%; aspect-ratio: 0.75; overflow: hidden; background: #0a0a0a; }
+        .card img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease; }
         .card-body { padding: 14px; }
-        .card-cat { font-size: 9px; font-weight: 200; opacity: 0.4; text-transform: uppercase; letter-spacing: 1.5px; }
-        .card-name { font-size: 14px; font-weight: 300; margin: 4px 0 6px; color: rgba(255,255,255,0.9); }
+        .card-cat { font-size: 9px; opacity: 0.4; text-transform: uppercase; letter-spacing: 1.5px; }
+        .card-name { font-size: 14px; font-weight: 300; margin: 4px 0 6px; }
         .card-price { font-size: 15px; font-weight: 400; }
 
-        /* iOS Dock */
-        .dock-container {
-            position: fixed;
-            bottom: calc(env(safe-area-inset-bottom) + 20px);
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-        }
-
-        .dock {
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(35px) saturate(1.5);
-            -webkit-backdrop-filter: blur(35px) saturate(1.5);
-            padding: 12px 35px;
-            border-radius: 40px;
+        /* Slider in Modal */
+        .slider-container {
+            width: 100%;
             display: flex;
-            gap: 45px;
-            box-shadow: inset 0 0 0 0.5px var(--hairline), 0 20px 40px rgba(0,0,0,0.5);
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 10px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            scrollbar-width: none;
         }
-
-        .dock-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0.35;
-            transition: 0.3s;
+        .slider-container::-webkit-scrollbar { display: none; }
+        .slider-item {
+            min-width: 100%;
+            scroll-snap-align: start;
+            aspect-ratio: 0.8;
+            border-radius: 30px;
+            overflow: hidden;
+            background: #111;
         }
+        .slider-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        .dock-item.active { opacity: 1; }
-        .dock-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
-        .dock-item span { font-size: 9px; font-weight: 300; letter-spacing: 0.5px; }
-
-        /* Modal */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            animation: ios-slide 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+        /* Form Elements */
+        .input-glass {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--hairline);
+            border-radius: 18px;
+            padding: 16px;
+            color: #fff;
+            font-size: 15px;
+            margin-bottom: 15px;
+            outline: none;
         }
-
-        @keyframes ios-slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .modal-nav {
-            padding: calc(env(safe-area-inset-top) + 15px) 20px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .close-btn {
-            background: var(--glass-active);
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-
-        .modal-body { padding: 0 20px 120px; overflow-y: auto; }
-        .modal-img-box { width: 100%; border-radius: 30px; overflow: hidden; margin-bottom: 25px; }
-        .modal-img-box img { width: 100%; display: block; }
 
         .size-btn {
-            flex: 1; padding: 18px; border-radius: 20px;
-            background: var(--glass); text-align: center;
+            flex: 1; padding: 15px; border-radius: 15px;
+            background: var(--glass); border: 1px solid var(--hairline);
+            text-align: center; transition: 0.3s;
         }
-        .size-btn.active { background: #fff; color: #000; font-weight: 500; }
+        .size-btn.active { background: #fff; color: #000; font-weight: 600; }
 
-        .buy-btn {
-            width: 100%; padding: 22px; border-radius: 28px;
-            background: #fff; color: #000; border: none;
-            font-size: 17px; font-weight: 500;
+        /* Dock */
+        .dock-container { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 20px); left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .dock { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(35px) saturate(1.5); padding: 12px 35px; border-radius: 40px; display: flex; gap: 45px; box-shadow: inset 0 0 0 0.5px var(--hairline); }
+        .dock-item { display: flex; flex-direction: column; align-items: center; opacity: 0.35; }
+        .dock-item.active { opacity: 1; }
+        .dock-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
+        .dock-item span { font-size: 9px; }
+
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: none; flex-direction: column; animation: ios-slide 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
+        @keyframes ios-slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-nav { padding: calc(env(safe-area-inset-top) + 15px) 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .close-btn { background: var(--glass-active); padding: 8px 18px; border-radius: 20px; font-size: 14px; }
+        .modal-body { padding: 0 20px 120px; overflow-y: auto; }
+
+        /* Payment Simulation Overlay */
+        #payment-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+            z-index: 3000; display: none; align-items: center; justify-content: center;
+            flex-direction: column; text-align: center;
         }
+        .loader { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .success-icon { font-size: 60px; color: #4BB543; display: none; }
 
-        .empty-msg { text-align: center; margin-top: 100px; opacity: 0.3; font-weight: 200; }
+        .buy-btn { width: 100%; padding: 22px; border-radius: 28px; background: #fff; color: #000; border: none; font-size: 17px; font-weight: 600; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -261,15 +126,10 @@
 
 <div class="app">
     <header>
-        <!-- Твой логотип kriss.png -->
         <img src="kriss.png" class="logo-img" alt="KRISS">
-
-        <div class="search-container" id="search-box">
-            <input type="text" class="search-input" id="search-input" placeholder="Поиск по коллекции..." oninput="doSearch()">
-        </div>
     </header>
 
-    <div class="nav-container" id="nav-ui">
+    <div class="nav-container">
         <div class="nav-capsule">
             <div class="nav-item active" onclick="setCat('все', this)">Все</div>
             <div class="nav-item" onclick="setCat('белье', this)">Белье</div>
@@ -283,28 +143,27 @@
 
 <div class="dock-container">
     <div class="dock">
-        <div class="dock-item active" id="tab-shop" onclick="nav('shop')">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.2"/></svg>
-            <span>МАГАЗИН</span>
-        </div>
-        <div class="dock-item" id="tab-search" onclick="nav('search')">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="1.2"/></svg>
-            <span>ПОИСК</span>
-        </div>
-        <div class="dock-item" id="tab-fav" onclick="nav('fav')">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.2"/></svg>
-            <span>ЛЮБИМОЕ</span>
-        </div>
+        <div class="dock-item active" onclick="location.reload()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.2"/></svg><span>МАГАЗИН</span></div>
+        <div class="dock-item" onclick="tg.showAlert('Поиск скоро появится')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="1.2"/></svg><span>ПОИСК</span></div>
+        <div class="dock-item" onclick="tg.showAlert('Избранное в разработке')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.2"/></svg><span>ЛЮБИМОЕ</span></div>
     </div>
 </div>
 
+<!-- Modal -->
 <div id="modal" class="modal">
     <div class="modal-nav">
         <div class="close-btn" onclick="closeModal()">Назад</div>
-        <div style="font-weight: 200; letter-spacing: 2px; font-size: 13px; opacity: 0.5;">KRISS NOIR</div>
+        <div style="font-weight: 200; letter-spacing: 2px; font-size: 13px; opacity: 0.5;">ОФОРМЛЕНИЕ</div>
         <div style="width: 60px;"></div>
     </div>
     <div class="modal-body" id="modal-content"></div>
+</div>
+
+<!-- Payment Simulation Overlay -->
+<div id="payment-overlay">
+    <div class="loader" id="pay-loader"></div>
+    <div class="success-icon" id="pay-success">✓</div>
+    <h2 id="pay-text" style="font-weight: 300; margin-top: 10px;">Обработка платежа...</h2>
 </div>
 
 <script>
@@ -319,88 +178,84 @@
         { id: 4, cat: 'халаты', name: "Midnight Kimono", price: 15600, img: "photo4.jpg", desc: "Халат из тяжелого шелка. Глубокий черный цвет." }
     ];
 
-    let favs = JSON.parse(localStorage.getItem('kriss_favs')) || [];
-    let curTab = 'shop';
-    let curCat = 'все';
-
     function render(list) {
         const catalog = document.getElementById('catalog');
-        if (list.length === 0) {
-            catalog.innerHTML = `<div class="empty-msg" style="grid-column: 1/3;">Список пуст</div>`;
-            return;
-        }
-        catalog.innerHTML = list.map(p => {
-            const isFav = favs.includes(p.id);
-            return `
-                <div class="card">
-                    <div class="fav-btn-quick ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${p.id})">
-                        <svg width="18" height="18" fill="${isFav ? 'var(--sakura)' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.5"/></svg>
-                    </div>
-                    <div class="img-wrap" onclick="openProduct(${p.id})">
-                        <img src="${p.img}" onload="this.style.opacity=1" onerror="this.src='https://via.placeholder.com/400x600/111/111?text=KRISS'">
-                    </div>
-                    <div class="card-body" onclick="openProduct(${p.id})">
-                        <div class="card-cat">${p.cat}</div>
-                        <div class="card-name">${p.name}</div>
-                        <div class="card-price">${p.price.toLocaleString()} ₽</div>
-                    </div>
+        catalog.innerHTML = list.map(p => `
+            <div class="card" onclick="openProduct(${p.id})">
+                <div class="img-wrap"><img src="${p.img}" onload="this.style.opacity=1" onerror="this.src='https://via.placeholder.com/400x600/111/111?text=KRISS'"></div>
+                <div class="card-body">
+                    <div class="card-cat">${p.cat}</div>
+                    <div class="card-name">${p.name}</div>
+                    <div class="card-price">${p.price.toLocaleString()} ₽</div>
                 </div>
-            `;
-        }).join('');
-    }
-
-    function nav(tab) {
-        curTab = tab;
-        document.querySelectorAll('.dock-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
-        document.getElementById('search-box').style.display = (tab === 'search') ? 'block' : 'none';
-        document.getElementById('nav-ui').style.display = (tab === 'fav') ? 'none' : 'flex';
-
-        if (tab === 'shop') render(DATA.filter(p => curCat === 'все' || p.cat === curCat));
-        if (tab === 'search') { document.getElementById('search-input').focus(); doSearch(); }
-        if (tab === 'fav') render(DATA.filter(p => favs.includes(p.id)));
-        tg.HapticFeedback.impactOccurred('light');
-    }
-
-    function doSearch() {
-        const q = document.getElementById('search-input').value.toLowerCase();
-        render(DATA.filter(p => p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q)));
-    }
-
-    function setCat(cat, el) {
-        curCat = cat;
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        if (curTab === 'shop') render(DATA.filter(p => cat === 'все' || p.cat === cat));
-        tg.HapticFeedback.impactOccurred('light');
-    }
-
-    function toggleFav(e, id) {
-        e.stopPropagation();
-        if (favs.includes(id)) favs = favs.filter(i => i !== id);
-        else { favs.push(id); tg.HapticFeedback.notificationOccurred('success'); }
-        localStorage.setItem('kriss_favs', JSON.stringify(favs));
-        nav(curTab);
+            </div>
+        `).join('');
     }
 
     function openProduct(id) {
         const p = DATA.find(x => x.id === id);
         document.getElementById('modal-content').innerHTML = `
-            <div class="modal-img-box"><img src="${p.img}"></div>
-            <div class="card-cat">${p.cat}</div>
-            <h2 style="font-weight:200; font-size:32px; margin:10px 0;">${p.name}</h2>
-            <p style="opacity:0.5; font-weight:300; line-height:1.6; margin-bottom:30px;">${p.desc}</p>
-            <div style="display:flex; gap:10px; margin-bottom:25px;">
-                <div class="size-btn active">S</div><div class="size-btn">M</div><div class="size-btn">L</div>
+            <div class="slider-container">
+                <div class="slider-item"><img src="${p.img}"></div>
+                <div class="slider-item"><img src="${p.img}"></div>
+                <div class="slider-item"><img src="${p.img}"></div>
             </div>
-            <button class="buy-btn" onclick="addToCart()">Добавить — ${p.price.toLocaleString()} ₽</button>
+            <h2 style="font-weight:300; font-size:28px; margin-bottom:10px;">${p.name}</h2>
+            <p style="opacity:0.5; font-weight:300; line-height:1.6; margin-bottom:25px;">${p.desc}</p>
+            
+            <div style="margin-bottom:20px;">
+                <p style="font-size:12px; opacity:0.4; margin-bottom:10px; text-transform:uppercase;">Выберите размер</p>
+                <div style="display:flex; gap:10px;">
+                    <div class="size-btn active" onclick="selSize(this)">S</div>
+                    <div class="size-btn" onclick="selSize(this)">M</div>
+                    <div class="size-btn" onclick="selSize(this)">L</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom:25px;">
+                <p style="font-size:12px; opacity:0.4; margin-bottom:10px; text-transform:uppercase;">Адрес доставки в Красноярске</p>
+                <input type="text" class="input-glass" value="г. Красноярск, " placeholder="Улица, дом, квартира">
+            </div>
+
+            <button class="buy-btn" onclick="startPayment(${p.price})">Оплатить — ${p.price.toLocaleString()} ₽</button>
         `;
         document.getElementById('modal').style.display = 'flex';
         tg.HapticFeedback.impactOccurred('medium');
     }
 
+    function selSize(el) {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        tg.HapticFeedback.selectionChanged();
+    }
+
+    function startPayment(amount) {
+        document.getElementById('payment-overlay').style.display = 'flex';
+        document.getElementById('pay-loader').style.display = 'block';
+        document.getElementById('pay-success').style.display = 'none';
+        document.getElementById('pay-text').innerText = "Обработка платежа...";
+        
+        tg.HapticFeedback.impactOccurred('heavy');
+
+        setTimeout(() => {
+            document.getElementById('pay-loader').style.display = 'none';
+            document.getElementById('pay-success').style.display = 'block';
+            document.getElementById('pay-text').innerText = "Оплачено успешно";
+            tg.HapticFeedback.notificationOccurred('success');
+            
+            setTimeout(() => {
+                document.getElementById('payment-overlay').style.display = 'none';
+                closeModal();
+            }, 2000);
+        }, 3000);
+    }
+
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    function addToCart() { tg.showAlert('Товар добавлен в корзину'); closeModal(); }
+    function setCat(cat, el) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        render(cat === 'все' ? DATA : DATA.filter(p => p.cat === cat));
+    }
 
     // Sakura Engine
     const canvas = document.getElementById('sakura');
@@ -408,36 +263,15 @@
     let petals = [];
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resize); resize();
-
     class Petal {
         constructor() { this.init(); }
-        init() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height - canvas.height;
-            this.size = Math.random() * 2 + 1;
-            this.speed = Math.random() * 0.2 + 0.1;
-            this.opacity = Math.random() * 0.1 + 0.05;
-        }
-        update() {
-            this.y += this.speed;
-            this.x += Math.sin(this.y / 100) * 0.1;
-            if (this.y > canvas.height) this.init();
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.ellipse(this.x, this.y, this.size, this.size/2, Math.PI/4, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
-            ctx.fill();
-        }
+        init() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height - canvas.height; this.size = Math.random() * 2 + 1; this.speed = Math.random() * 0.2 + 0.1; this.opacity = Math.random() * 0.1 + 0.05; }
+        update() { this.y += this.speed; this.x += Math.sin(this.y / 100) * 0.1; if (this.y > canvas.height) this.init(); }
+        draw() { ctx.beginPath(); ctx.ellipse(this.x, this.y, this.size, this.size/2, Math.PI/4, 0, Math.PI * 2); ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`; ctx.fill(); }
     }
     for (let i = 0; i < 20; i++) petals.push(new Petal());
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        petals.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(animate);
-    }
-    render(DATA);
-    animate();
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); petals.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+    render(DATA); animate();
 </script>
 </body>
 </html>
