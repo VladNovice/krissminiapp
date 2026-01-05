@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>KRISS — Noir Premium</title>
+    <title>KRISS — Noir Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -25,7 +25,7 @@
         body {
             background: var(--bg);
             color: #fff;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
@@ -37,10 +37,11 @@
             pointer-events: none;
         }
 
+        /* App Shell */
         .app {
             position: relative;
             z-index: 1;
-            padding: calc(env(safe-area-inset-top) + 15px) 16px 140px;
+            padding: calc(env(safe-area-inset-top) + 10px) 16px 140px;
         }
 
         header {
@@ -49,14 +50,14 @@
             padding: 10px 0 25px 4px;
         }
 
-        /* Логотип кодом (SVG) - всегда загрузится */
+        /* Логотип KRISS (SVG) */
         .logo-svg {
-            height: 24px;
+            height: 26px;
             fill: #fff;
         }
 
-        /* Капсульное меню (Segmented Control) */
-        .nav-pill-box {
+        /* Капсульное меню в стиле папок Telegram */
+        .nav-container {
             display: flex;
             justify-content: center;
             margin-bottom: 25px;
@@ -65,18 +66,18 @@
             z-index: 100;
         }
 
-        .nav-pill {
+        .nav-capsule {
             display: flex;
-            background: rgba(15, 15, 15, 0.8);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(15, 15, 15, 0.75);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             padding: 4px;
             border-radius: 22px;
             box-shadow: inset 0 0 0 0.5px var(--hairline);
             width: 100%;
         }
 
-        .nav-btn {
+        .nav-item {
             flex: 1;
             text-align: center;
             padding: 10px 0;
@@ -84,15 +85,15 @@
             font-size: 13px;
             font-weight: 300;
             color: rgba(255, 255, 255, 0.4);
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .nav-btn.active {
+        .nav-item.active {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
         }
 
-        /* Product Grid */
+        /* Сетка товаров */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -109,31 +110,31 @@
             box-shadow: inset 0 0 0 0.5px var(--hairline);
         }
 
+        .card:active { transform: scale(0.96); }
+
         .img-wrap {
             width: 100%;
             aspect-ratio: 0.8;
             border-radius: 25px;
             overflow: hidden;
-            background: #111;
+            background: linear-gradient(45deg, #0a0a0a, #1a1a1a);
             margin-bottom: 12px;
-            position: relative;
         }
 
         .card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.6s ease;
         }
 
         .card-body { padding: 0 10px 10px; }
         .card-cat { font-size: 9px; font-weight: 200; opacity: 0.4; text-transform: uppercase; letter-spacing: 1.5px; }
-        .card-name { font-size: 14px; font-weight: 300; margin: 4px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-name { font-size: 14px; font-weight: 300; margin: 4px 0 6px; color: rgba(255,255,255,0.9); }
         .card-price { font-size: 15px; font-weight: 400; }
 
-        /* Floating Dock */
+        /* Floating iOS Dock */
         .dock-container {
             position: fixed;
             bottom: calc(env(safe-area-inset-bottom) + 20px);
@@ -144,8 +145,8 @@
 
         .dock {
             background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(30px) saturate(1.5);
-            -webkit-backdrop-filter: blur(30px) saturate(1.5);
+            backdrop-filter: blur(35px) saturate(1.5);
+            -webkit-backdrop-filter: blur(35px) saturate(1.5);
             padding: 12px 35px;
             border-radius: 40px;
             display: flex;
@@ -158,11 +159,12 @@
             flex-direction: column;
             align-items: center;
             opacity: 0.35;
+            transition: 0.3s;
         }
 
         .dock-item.active { opacity: 1; }
         .dock-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
-        .dock-item span { font-size: 9px; font-weight: 300; }
+        .dock-item span { font-size: 9px; font-weight: 300; letter-spacing: 0.5px; }
 
         /* Fullscreen Modal */
         .modal {
@@ -181,6 +183,7 @@
             padding: calc(env(safe-area-inset-top) + 15px) 20px 10px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .close-btn {
@@ -188,17 +191,18 @@
             padding: 8px 18px;
             border-radius: 20px;
             font-size: 14px;
+            font-weight: 300;
         }
 
         .modal-body { padding: 0 20px 120px; overflow-y: auto; }
-        .modal-img-box { width: 100%; border-radius: 35px; overflow: hidden; margin-bottom: 25px; background: #111; }
+        .modal-img-box { width: 100%; border-radius: 35px; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 0 0.5px var(--hairline); }
         .modal-img-box img { width: 100%; display: block; }
 
         .size-wrap { display: flex; gap: 10px; margin: 25px 0; }
         .size-btn {
             flex: 1; padding: 18px; border-radius: 20px;
             background: var(--glass); box-shadow: inset 0 0 0 0.5px var(--hairline);
-            text-align: center;
+            text-align: center; font-weight: 300;
         }
         .size-btn.active { background: #fff; color: #000; font-weight: 500; }
 
@@ -207,6 +211,7 @@
             background: #fff; color: #000; border: none;
             font-size: 17px; font-weight: 500;
         }
+
     </style>
 </head>
 <body>
@@ -215,21 +220,24 @@
 
 <div class="app">
     <header>
+        <!-- Логотип встроен кодом, чтобы грузился мгновенно -->
         <svg class="logo-svg" viewBox="0 0 300 60">
-            <text x="0" y="45" font-family="Inter" font-weight="100" font-size="40" letter-spacing="15" fill="white">KRISS</text>
+            <text x="0" y="45" font-family="Inter" font-weight="100" font-size="42" letter-spacing="14" fill="white">KRISS</text>
         </svg>
     </header>
 
-    <div class="nav-pill-box">
-        <div class="nav-pill">
-            <div class="nav-btn active" onclick="filter('все', this)">Все</div>
-            <div class="nav-btn" onclick="filter('белье', this)">Белье</div>
-            <div class="nav-btn" onclick="filter('пижамы', this)">Пижамы</div>
-            <div class="nav-btn" onclick="filter('халаты', this)">Халаты</div>
+    <div class="nav-container">
+        <div class="nav-capsule">
+            <div class="nav-item active" onclick="filter('все', this)">Все</div>
+            <div class="nav-item" onclick="filter('белье', this)">Белье</div>
+            <div class="nav-item" onclick="filter('пижамы', this)">Пижамы</div>
+            <div class="nav-item" onclick="filter('халаты', this)">Халаты</div>
         </div>
     </div>
 
-    <div class="grid" id="catalog"></div>
+    <div class="grid" id="catalog">
+        <!-- Товары -->
+    </div>
 </div>
 
 <div class="dock-container">
@@ -252,7 +260,7 @@
 <div id="modal" class="modal">
     <div class="modal-nav">
         <div class="close-btn" onclick="closeModal()">Назад</div>
-        <div style="font-weight: 200; letter-spacing: 2px; font-size: 12px; opacity: 0.5;">KRISS NOIR</div>
+        <div style="font-weight: 200; letter-spacing: 2px; font-size: 13px; opacity: 0.5;">KRISS NOIR</div>
         <div style="width: 60px;"></div>
     </div>
     <div class="modal-body" id="modal-content"></div>
@@ -263,32 +271,20 @@
     tg.expand();
     tg.backgroundColor = '#000000';
 
-    // Используем максимально надежные ссылки. Если не грузятся - проверьте VPN или интернет.
+    // Твои локальные фото
     const PRODUCTS = [
-        { id: 1, cat: 'белье', name: "Lace Noir Set", price: 8500, img: "https://images.unsplash.com/photo-1582533075130-993da3620986?w=600&q=80", desc: "Сексуальное черное кружево ручной работы. Идеальная посадка." },
-        { id: 2, cat: 'белье', name: "Silk Pearl Bra", price: 7200, img: "https://images.unsplash.com/photo-1551489186-cf8726f514f8?w=600&q=80", desc: "Шелковый бюстгальтер в жемчужном оттенке." },
-        { id: 3, cat: 'белье', name: "Passion Body", price: 9400, img: "https://images.unsplash.com/photo-1618331835717-801697a54139?w=600&q=80", desc: "Кружевное боди, подчеркивающее силуэт." },
-        { id: 4, cat: 'пижамы', name: "Silk Night Gown", price: 12900, img: "https://images.unsplash.com/photo-1544441893-675973e31985?w=600&q=80", desc: "Натуральный шелк для самых нежных ночей." },
-        { id: 5, cat: 'халаты', name: "Midnight Kimono", price: 15600, img: "https://images.unsplash.com/photo-1623091411395-09e79fdbfcf3?w=600&q=80", desc: "Роскошный халат из тяжелого матового шелка." },
-        { id: 6, cat: 'пижамы', name: "Satin Noir Set", price: 6800, img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=80", desc: "Классическая черная пижама." }
+        { id: 1, cat: 'белье', name: "Lace Noir Set", price: 8500, img: "photo1.jpg", desc: "Сексуальное черное кружево ручной работы. Идеальная посадка и французский шарм." },
+        { id: 2, cat: 'пижамы', name: "Silk Pearl Gown", price: 12900, img: "photo2.jpg", desc: "Натуральный шелк в жемчужном оттенке. Невесомая роскошь для ваших ночей." },
+        { id: 3, cat: 'белье', name: "Passion Body", price: 7400, img: "photo3.jpg", desc: "Кружевное боди, подчеркивающее каждую линию тела. Смелый выбор." },
+        { id: 4, cat: 'халаты', name: "Midnight Kimono", price: 15600, img: "photo4.jpg", desc: "Длинный халат из тяжелого шелка. Глубокий черный цвет и матовый блеск." }
     ];
-
-    // Функция для обработки ошибок загрузки фото
-    function handleImgError(img) {
-        img.onerror = null;
-        // Если фото не загрузилось, ставим элегантную заглушку (серый градиент)
-        img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
-        img.parentElement.style.background = "linear-gradient(45deg, #1a1a1a, #333)";
-    }
 
     function render(data) {
         const catalog = document.getElementById('catalog');
         catalog.innerHTML = data.map(p => `
             <div class="card" onclick="openProduct(${p.id})">
                 <div class="img-wrap">
-                    <img src="${p.img}" 
-                         onload="this.style.opacity=1" 
-                         onerror="handleImgError(this)">
+                    <img src="${p.img}" onload="this.style.opacity=1" onerror="this.src='https://via.placeholder.com/400x500/111/111?text=KRISS'">
                 </div>
                 <div class="card-body">
                     <div class="card-cat">${p.cat}</div>
@@ -300,7 +296,7 @@
     }
 
     function filter(category, el) {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         const filtered = category === 'все' ? PRODUCTS : PRODUCTS.filter(p => p.cat === category);
         render(filtered);
@@ -314,7 +310,7 @@
         
         content.innerHTML = `
             <div class="modal-img-box">
-                <img src="${p.img}" onerror="handleImgError(this)">
+                <img src="${p.img}">
             </div>
             <div class="card-cat" style="margin-bottom:8px">${p.cat}</div>
             <h2 style="font-weight: 200; font-size: 32px; margin-bottom: 12px;">${p.name}</h2>
@@ -341,10 +337,10 @@
     function addToCart() {
         tg.HapticFeedback.notificationOccurred('success');
         closeModal();
-        tg.showAlert('Товар добавлен в избранное');
+        tg.showAlert('Добавлено в избранное');
     }
 
-    // Sakura Engine
+    // Sakura Engine (Zen Edition)
     const canvas = document.getElementById('sakura');
     const ctx = canvas.getContext('2d');
     let petals = [];
@@ -361,24 +357,31 @@
         init() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height - canvas.height;
-            this.size = Math.random() * 2 + 1;
-            this.speed = Math.random() * 0.3 + 0.1;
-            this.opacity = Math.random() * 0.1 + 0.05;
+            this.size = Math.random() * 2.5 + 1;
+            this.speed = Math.random() * 0.2 + 0.1;
+            this.angle = Math.random() * Math.PI * 2;
+            this.spin = Math.random() * 0.01 - 0.005;
+            this.opacity = Math.random() * 0.12 + 0.04;
         }
         update() {
             this.y += this.speed;
-            this.x += Math.sin(this.y / 100) * 0.1;
+            this.x += Math.sin(this.y / 100) * 0.15;
+            this.angle += this.spin;
             if (this.y > canvas.height) this.init();
         }
         draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
             ctx.beginPath();
-            ctx.ellipse(this.x, this.y, this.size, this.size/2, Math.PI/4, 0, Math.PI * 2);
+            ctx.ellipse(0, 0, this.size, this.size/2, 0, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
             ctx.fill();
+            ctx.restore();
         }
     }
 
-    for (let i = 0; i < 20; i++) petals.push(new Petal());
+    for (let i = 0; i < 22; i++) petals.push(new Petal());
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
