@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>KRISS — Noir Edition 2026</title>
+    <title>KRISS — Noir Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #000000;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --accent: #ffffff;
-            --system-gray: #1c1c1e;
-            --text-secondary: rgba(255, 255, 255, 0.5);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-heavy: rgba(15, 15, 15, 0.85);
+            --hairline: rgba(255, 255, 255, 0.12);
+            --sakura: #ffb7c5;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -26,248 +25,139 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.5; }
+        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 
-        .app { position: relative; z-index: 1; padding: calc(env(safe-area-inset-top) + 20px) 16px 140px; }
-
-        /* Header */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 0 4px 30px; }
-        .brand-name { font-size: 24px; font-weight: 800; letter-spacing: -1px; text-transform: uppercase; }
-        .cart-icon { position: relative; padding: 8px; background: var(--glass); border-radius: 50%; border: 0.5px solid var(--glass-border); }
-
-        /* Catalog Grid */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        
-        .card { 
-            background: var(--glass); 
-            border-radius: 28px; 
-            overflow: hidden; 
-            border: 0.5px solid var(--glass-border); 
+        /* --- HEADER (MIRROR LOGIC) --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: calc(env(safe-area-inset-top) + 10px) 20px 15px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-        .card:active { transform: scale(0.97); }
-
-        .img-wrap { 
-            width: 100%; 
-            aspect-ratio: 0.75; 
-            overflow: hidden; 
-            position: relative;
-        }
-        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
-        
-        .card-badge {
-            position: absolute; top: 12px; left: 12px;
-            padding: 4px 10px; background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px); border-radius: 10px;
-            font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0);
         }
 
-        .card-fav {
-            position: absolute; top: 12px; right: 12px;
-            width: 28px; height: 28px; background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+        header.scrolled {
+            background: rgba(15, 15, 15, 0.7);
+            backdrop-filter: blur(25px) saturate(1.5);
+            -webkit-backdrop-filter: blur(25px) saturate(1.5);
+            border-bottom: 0.5px solid var(--hairline);
         }
 
-        .card-body { padding: 14px; }
-        .card-name { font-size: 14px; font-weight: 400; color: var(--text-secondary); margin-bottom: 4px; }
-        .card-price { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+        .logo-img { height: 35px; width: auto; filter: brightness(0) invert(1); transition: 0.3s; }
 
-        /* --- MODAL PRODUCT --- */
+        .app { position: relative; z-index: 1; padding: calc(env(safe-area-inset-top) + 80px) 16px 140px; }
+
+        /* --- GRID --- */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .card { background: var(--glass); border-radius: 30px; overflow: hidden; border: 0.5px solid var(--hairline); }
+        .img-wrap { width: 100%; aspect-ratio: 0.75; background: #0a0a0a; overflow: hidden; }
+        .card img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s; }
+        .card-body { padding: 12px; }
+        .card-price { font-weight: 500; font-size: 15px; margin-top: 4px; }
+
+        /* --- PRODUCT MODAL --- */
         .modal { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; z-index: 2000; display: none; flex-direction: column;
-            animation: modalSlide 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            background: #000; z-index: 2000; display: none; 
+            flex-direction: column; animation: ios-slide 0.5s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
-        @keyframes modalSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes ios-slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .modal-header {
-            position: absolute; top: 0; width: 100%; z-index: 100;
-            padding: calc(env(safe-area-inset-top) + 10px) 20px 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: 0.3s;
-        }
-        .modal-header.scrolled {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border-bottom: 0.5px solid var(--glass-border);
-        }
+        .modal-main-img { width: 100%; aspect-ratio: 0.8; object-fit: cover; border-radius: 0 0 40px 40px; }
         
-        .back-btn {
-            width: 36px; height: 36px; background: rgba(255,255,255,0.1); 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
-        }
+        /* Thumbnails Gallery */
+        .thumb-nav { display: flex; gap: 10px; padding: 15px 20px; overflow-x: auto; scrollbar-width: none; }
+        .thumb-nav::-webkit-scrollbar { display: none; }
+        .thumb { width: 70px; height: 90px; border-radius: 15px; object-fit: cover; opacity: 0.5; border: 1px solid transparent; transition: 0.3s; flex-shrink: 0; }
+        .thumb.active { opacity: 1; border-color: #fff; }
 
-        .modal-content { overflow-y: auto; height: 100%; padding-bottom: 150px; scroll-behavior: smooth; }
-
-        .gallery-container { position: relative; width: 100%; aspect-ratio: 0.8; }
-        .gallery-scroll { 
-            display: flex; overflow-x: auto; scroll-snap-type: x mandatory; 
-            height: 100%; scrollbar-width: none;
-        }
-        .gallery-scroll::-webkit-scrollbar { display: none; }
-        .gallery-item { min-width: 100%; scroll-snap-align: start; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .gallery-dots {
-            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 6px; padding: 6px 10px; background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(15px); border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.1);
-        }
-        .dot { width: 5px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; }
-        .dot.active { background: #fff; width: 15px; border-radius: 4px; }
-
-        .details-box { padding: 32px 24px; }
-        .product-cat { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 1.5px; margin-bottom: 8px; }
-        .product-title { font-size: 32px; font-weight: 700; letter-spacing: -0.8px; margin-bottom: 12px; }
-        .product-desc { font-size: 15px; line-height: 1.6; color: var(--text-secondary); font-weight: 400; margin-bottom: 32px; }
-
-        .section-label { font-size: 13px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-        
-        .size-selector { display: flex; gap: 10px; margin-bottom: 32px; }
-        .size-chip { 
-            flex: 1; padding: 18px; border-radius: 20px; background: var(--glass);
-            border: 0.5px solid var(--glass-border); text-align: center; font-size: 15px; transition: 0.2s;
-            font-weight: 500;
-        }
-        .size-chip.active { background: #fff; color: #000; border-color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
-
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .info-item { background: var(--glass); padding: 16px; border-radius: 18px; border: 0.5px solid var(--glass-border); }
-        .info-item-label { font-size: 10px; text-transform: uppercase; opacity: 0.4; margin-bottom: 4px; }
-        .info-item-val { font-size: 13px; font-weight: 500; }
-
-        /* Bottom Bar */
-        .bottom-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            padding: 20px 24px calc(env(safe-area-inset-bottom) + 15px);
-            background: linear-gradient(to top, #000 80%, transparent);
-            z-index: 110;
-        }
-        .main-btn {
-            width: 100%; padding: 22px; border-radius: 24px; background: #fff;
-            color: #000; border: none; font-size: 17px; font-weight: 700;
-            display: flex; justify-content: center; align-items: center; gap: 12px;
-            box-shadow: 0 15px 30px rgba(255,255,255,0.1);
-        }
-
-        /* Checkout Sheet */
+        /* --- CHECKOUT SHEET (APPLE STYLE) --- */
         .sheet {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: auto;
-            background: #1c1c1e; border-radius: 36px 36px 0 0; z-index: 3000;
-            padding: 20px 24px calc(env(safe-area-inset-bottom) + 20px);
-            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-            border-top: 0.5px solid var(--glass-border);
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: var(--glass-heavy); backdrop-filter: blur(40px);
+            border-radius: 35px 35px 0 0; z-index: 3000;
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            padding: 30px 20px calc(env(safe-area-inset-bottom) + 20px);
+            border-top: 0.5px solid var(--hairline);
         }
-        .sheet.active { transform: translateY(0); }
-        .sheet-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: 0 auto 30px; }
+        .sheet.open { transform: translateY(0); }
 
-        /* Input */
-        .input-ios {
-            width: 100%; background: rgba(255,255,255,0.06); border: 0.5px solid var(--glass-border);
-            border-radius: 20px; padding: 20px; color: #fff; font-size: 16px; margin: 20px 0;
-            outline: none; transition: 0.3s;
+        .ios-input {
+            width: 100%; background: rgba(255,255,255,0.06); border: none;
+            padding: 18px; border-radius: 20px; color: #fff; font-size: 17px;
+            margin-top: 15px; outline: none; border: 0.5px solid var(--hairline);
         }
-        .input-ios:focus { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
 
-        /* Pay Overlay */
-        .pay-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.98); z-index: 5000; display: none;
-            align-items: center; justify-content: center; flex-direction: column;
-            backdrop-filter: blur(20px);
+        /* --- APPLE PAY SIMULATION --- */
+        .apple-pay-ui {
+            display: none; flex-direction: column; align-items: center; text-align: center;
         }
-        .faceid-node {
-            width: 80px; height: 80px; border: 3px solid #007AFF; border-radius: 22px;
-            margin-bottom: 25px; position: relative;
-        }
-        .faceid-node::before {
-            content: ''; position: absolute; inset: 12px; border: 3px solid #007AFF; border-radius: 10px;
-            animation: scan 2s infinite ease-in-out;
-        }
-        @keyframes scan { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.15); opacity: 1; } }
+        .face-id-icon { width: 60px; height: 60px; margin: 20px 0; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        .buy-btn { width: 100%; padding: 22px; border-radius: 25px; background: #fff; color: #000; font-weight: 600; font-size: 17px; border: none; margin-top: 25px; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; z-index: 10; }
+
+        /* Dock */
+        .dock-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100; }
+        .dock { background: rgba(15,15,15,0.8); backdrop-filter: blur(30px); padding: 12px 35px; border-radius: 40px; display: flex; gap: 40px; border: 0.5px solid var(--hairline); }
+        .dock-item { opacity: 0.4; display: flex; flex-direction: column; align-items: center; font-size: 9px; }
+        .dock-item.active { opacity: 1; }
     </style>
 </head>
 <body>
 
 <canvas id="sakura"></canvas>
 
-<div class="app">
-    <header>
-        <div class="brand-name">KRISS</div>
-        <div class="cart-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6zM3 6h18M16 10a4 4 0 01-8 0"/></svg>
-        </div>
-    </header>
+<header id="main-header">
+    <img src="kriss.png" class="logo-img" alt="KRISS">
+</header>
 
+<div class="app">
     <div class="grid" id="catalog"></div>
 </div>
 
-<!-- Modal Product -->
+<!-- Product Modal -->
 <div id="modal" class="modal">
-    <div class="modal-header" id="modal-header">
-        <div class="back-btn" onclick="closeModal()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-        </div>
-        <div id="header-title" style="opacity: 0; font-weight: 700; font-size: 16px; letter-spacing: -0.3px;">Product</div>
-        <div class="back-btn" style="background: transparent;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 21a9 9 0 100-18 9 9 0 000 18zM12 8v4m0 4h.01"/></svg>
-        </div>
-    </div>
-
-    <div class="modal-content" id="modal-scroll" onscroll="handleScroll(this)">
-        <div class="gallery-container">
-            <div class="gallery-scroll" id="gallery" onscroll="updateDots(this)"></div>
-            <div class="gallery-dots" id="dots"></div>
-        </div>
-
-        <div class="details-box" id="product-details"></div>
-    </div>
-
-    <div class="bottom-bar">
-        <button class="main-btn" onclick="openCheckout()">
-            <span>Добавить</span>
-            <span style="opacity: 0.3; margin: 0 8px;">|</span>
-            <span id="btn-price"></span>
-        </button>
-    </div>
+    <div class="close-modal" onclick="closeModal()">Закрыть</div>
+    <div id="modal-content" style="overflow-y: auto;"></div>
 </div>
 
 <!-- Checkout Sheet -->
-<div id="sheet" class="sheet">
-    <div class="sheet-handle"></div>
-    <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 25px; letter-spacing: -0.5px;">Оплата</h2>
+<div id="checkout-sheet" class="sheet">
+    <div id="step-address">
+        <h2 style="font-weight: 500; font-size: 24px;">Адрес доставки</h2>
+        <p style="opacity: 0.5; font-size: 14px; margin-top: 5px;">Только Красноярск</p>
+        <input type="text" class="ios-input" id="addr" placeholder="Улица, дом, квартира" value="г. Красноярск, ">
+        <button class="buy-btn" onclick="showApplePay()">Продолжить</button>
+    </div>
 
-    <div style="display: flex; gap: 18px; background: rgba(255,255,255,0.04); padding: 18px; border-radius: 24px; border: 0.5px solid var(--glass-border);">
-        <img id="sheet-img" src="" style="width: 70px; height: 70px; border-radius: 16px; object-fit: cover;">
-        <div style="display: flex; flex-direction: column; justify-content: center;">
-            <div id="sheet-name" style="font-weight: 700; font-size: 17px;"></div>
-            <div id="sheet-size" style="opacity: 0.5; font-size: 14px; margin-top: 4px;">Размер: S</div>
+    <div id="step-pay" class="apple-pay-ui">
+        <img src="https://cdn-icons-png.flaticon.com/512/5617/5617931.png" class="face-id-icon" style="filter: invert(1);">
+        <h3 style="font-weight: 400;">Apple Pay</h3>
+        <p style="opacity: 0.5; margin-top: 10px;">Подтвердите оплату FaceID</p>
+        <div style="margin-top: 30px; width: 100%; border-top: 0.5px solid var(--hairline); padding-top: 20px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; opacity: 0.6; font-size: 14px;">
+                <span>Карта</span>
+                <span>•••• 4412</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 20px; margin-top: 10px;">
+                <span>Итого</span>
+                <span id="final-price">0 ₽</span>
+            </div>
         </div>
+        <button class="buy-btn" style="background: #fff;" onclick="processFinalPay()">Оплатить</button>
     </div>
-
-    <input type="text" class="input-ios" placeholder="Адрес доставки" id="addr" value="г. Красноярск, ул. Мира, 10">
-
-    <div style="display: flex; justify-content: space-between; margin: 20px 4px 30px;">
-        <span style="opacity: 0.5; font-weight: 500;">К оплате</span>
-        <span id="sheet-total" style="font-weight: 800; font-size: 22px;"></span>
-    </div>
-
-    <button class="main-btn" style="background: #fff; color: #000;" onclick="confirmPayment()">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z"/></svg>
-        Apple Pay
-    </button>
 </div>
 
-<!-- Apple Pay Simulation -->
-<div class="pay-overlay" id="pay-overlay">
-    <div id="pay-content" style="text-align: center;">
-        <div class="faceid-node"></div>
-        <div style="font-size: 22px; font-weight: 600; margin-bottom: 8px;">Face ID</div>
-        <div style="opacity: 0.5; font-size: 15px;">Подтверждение оплаты...</div>
+<div class="dock-container">
+    <div class="dock">
+        <div class="dock-item active"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.2"/></svg><span>SHOP</span></div>
+        <div class="dock-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="1.2"/></svg><span>SEARCH</span></div>
+        <div class="dock-item"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.2"/></svg><span>FAV</span></div>
     </div>
 </div>
 
@@ -275,29 +165,29 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
     tg.backgroundColor = '#000000';
-    tg.headerColor = '#000000';
 
     const DATA = [
-        { id: 1, cat: 'Lingerie', name: "Silk Noir Set", price: 8900, imgs: ["https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=800", "https://images.unsplash.com/photo-1581333100576-b73bbebd3c2e?w=800"], desc: "Изысканный комплект из натурального шелка и французского кружева ручной работы. Создан для особых моментов.", fabric: "100% Шелк", care: "Сухая чистка" },
-        { id: 2, cat: 'Homewear', name: "Pearl Satin", price: 11500, imgs: ["https://images.unsplash.com/photo-1598554747436-c9293d6a588f?w=800"], desc: "Атласная пижама в жемчужном оттенке. Свободный крой и невероятная мягкость ткани.", fabric: "Атлас премиум", care: "Деликатная стирка" },
-        { id: 3, cat: 'Bodysuits', name: "Velvet Body", price: 7200, imgs: ["https://images.unsplash.com/photo-1610384029267-3930d99bc361?w=800"], desc: "Бархатное боди с глубоким вырезом. Идеальное дополнение к вечернему образу.", fabric: "Бархат, эластан", care: "Ручная стирка" },
-        { id: 4, cat: 'Limited', name: "Royal Kimono", price: 14900, imgs: ["https://images.unsplash.com/photo-1566206091558-7f218b696731?w=800"], desc: "Тяжелый шелк с авторской вышивкой на спине. Каждое изделие нумеруется вручную.", fabric: "Шелк Малбери", care: "Luxe Care" }
+        { id: 1, name: "Lace Noir Set", price: 8500, img: "photo1.jpg" },
+        { id: 2, name: "Silk Pearl Gown", price: 12900, img: "photo2.jpg" },
+        { id: 3, name: "Passion Body", price: 7400, img: "photo3.jpg" },
+        { id: 4, name: "Midnight Kimono", price: 15600, img: "photo4.jpg" }
     ];
 
-    let currentItem = null;
-    let selectedSize = 'S';
+    // Mirror Header Logic
+    window.onscroll = function() {
+        const header = document.getElementById('main-header');
+        if (window.pageYOffset > 20) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
+    };
 
-    function renderCatalog() {
+    function render() {
         const catalog = document.getElementById('catalog');
         catalog.innerHTML = DATA.map(p => `
             <div class="card" onclick="openProduct(${p.id})">
-                <div class="img-wrap">
-                    <div class="card-badge">${p.cat}</div>
-                    <div class="card-fav"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l8.84-8.84 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
-                    <img src="${p.imgs[0]}" loading="lazy">
-                </div>
+                <div class="img-wrap"><img src="${p.img}" onload="this.style.opacity=1"></div>
                 <div class="card-body">
-                    <div class="card-name">${p.name}</div>
+                    <div style="font-size: 13px; font-weight: 200; opacity: 0.6;">KRISS NOIR</div>
+                    <div style="font-size: 14px; margin-top: 2px;">${p.name}</div>
                     <div class="card-price">${p.price.toLocaleString()} ₽</div>
                 </div>
             </div>
@@ -305,112 +195,68 @@
     }
 
     function openProduct(id) {
-        currentItem = DATA.find(x => x.id === id);
-        
-        const gallery = document.getElementById('gallery');
-        gallery.innerHTML = currentItem.imgs.map(img => `
-            <div class="gallery-item"><img src="${img}"></div>
-        `).join('');
-
-        const dots = document.getElementById('dots');
-        dots.innerHTML = currentItem.imgs.map((_, i) => `<div class="dot ${i===0?'active':''}"></div>`).join('');
-
-        document.getElementById('header-title').innerText = currentItem.name;
-        document.getElementById('product-details').innerHTML = `
-            <div class="product-cat">${currentItem.cat}</div>
-            <h1 class="product-title">${currentItem.name}</h1>
-            <p class="product-desc">${currentItem.desc}</p>
-            
-            <div class="section-label">Выберите размер <span>Таблица размеров</span></div>
-            <div class="size-selector">
-                <div class="size-chip active" onclick="selectSize(this, 'S')">S</div>
-                <div class="size-chip" onclick="selectSize(this, 'M')">M</div>
-                <div class="size-chip" onclick="selectSize(this, 'L')">L</div>
+        const p = DATA.find(x => x.id === id);
+        const modal = document.getElementById('modal');
+        document.getElementById('modal-content').innerHTML = `
+            <img src="${p.img}" class="modal-main-img" id="main-view">
+            <div class="thumb-nav">
+                <img src="${p.img}" class="thumb active" onclick="setImg(this)">
+                <img src="${p.img}" class="thumb" onclick="setImg(this)">
+                <img src="${p.img}" class="thumb" onclick="setImg(this)">
+                <img src="${p.img}" class="thumb" onclick="setImg(this)">
             </div>
-
-            <div class="section-label">Характеристики</div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-item-label">Материал</div>
-                    <div class="info-item-val">${currentItem.fabric}</div>
+            <div style="padding: 20px;">
+                <h1 style="font-weight: 300; font-size: 32px;">${p.name}</h1>
+                <p style="opacity: 0.5; font-weight: 300; margin-top: 10px; line-height: 1.6;">
+                    Эксклюзивное изделие KRISS. Шелк и кружево высшего качества.
+                </p>
+                <div style="margin-top: 30px;">
+                    <p style="font-size: 12px; opacity: 0.4; text-transform: uppercase;">Размер</p>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <div style="flex:1; padding: 15px; border: 1px solid #fff; border-radius: 15px; text-align:center;">S</div>
+                        <div style="flex:1; padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; text-align:center; opacity: 0.5;">M</div>
+                        <div style="flex:1; padding: 15px; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; text-align:center; opacity: 0.5;">L</div>
+                    </div>
                 </div>
-                <div class="info-item">
-                    <div class="info-item-label">Уход</div>
-                    <div class="info-item-val">${currentItem.care}</div>
-                </div>
+                <button class="buy-btn" onclick="startCheckout(${p.price})">Купить за ${p.price.toLocaleString()} ₽</button>
             </div>
         `;
-
-        document.getElementById('btn-price').innerText = currentItem.price.toLocaleString() + ' ₽';
-        document.getElementById('modal').style.display = 'flex';
+        modal.style.display = 'flex';
         tg.HapticFeedback.impactOccurred('medium');
     }
 
-    function handleScroll(el) {
-        const header = document.getElementById('modal-header');
-        const title = document.getElementById('header-title');
-        if (el.scrollTop > 300) {
-            header.classList.add('scrolled');
-            title.style.opacity = "1";
-        } else {
-            header.classList.remove('scrolled');
-            title.style.opacity = "0";
-        }
-    }
-
-    function updateDots(el) {
-        const index = Math.round(el.scrollLeft / el.offsetWidth);
-        const dots = document.querySelectorAll('.dot');
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-    }
-
-    function selectSize(el, size) {
-        selectedSize = size;
-        document.querySelectorAll('.size-chip').forEach(c => c.classList.remove('active'));
+    function setImg(el) {
+        document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
+        document.getElementById('main-view').src = el.src;
         tg.HapticFeedback.selectionChanged();
     }
 
-    function openCheckout() {
-        document.getElementById('sheet-img').src = currentItem.imgs[0];
-        document.getElementById('sheet-name').innerText = currentItem.name;
-        document.getElementById('sheet-size').innerText = 'Размер: ' + selectedSize;
-        document.getElementById('sheet-total').innerText = currentItem.price.toLocaleString() + ' ₽';
-        document.getElementById('sheet').classList.add('active');
-        tg.HapticFeedback.impactOccurred('light');
+    function startCheckout(price) {
+        document.getElementById('final-price').innerText = price.toLocaleString() + ' ₽';
+        document.getElementById('checkout-sheet').classList.add('open');
+        tg.HapticFeedback.impactOccurred('medium');
     }
 
-    function closeModal() {
-        document.getElementById('modal').style.display = 'none';
-        document.getElementById('sheet').classList.remove('active');
-    }
-
-    function confirmPayment() {
-        document.getElementById('pay-overlay').style.display = 'flex';
+    function showApplePay() {
+        if(document.getElementById('addr').value.length < 18) {
+            tg.showAlert('Введите полный адрес в Красноярске');
+            return;
+        }
+        document.getElementById('step-address').style.display = 'none';
+        document.getElementById('step-pay').style.display = 'flex';
         tg.HapticFeedback.impactOccurred('heavy');
-
-        setTimeout(() => {
-            document.getElementById('pay-content').innerHTML = `
-                <div style="color: #4BB543; font-size: 80px; margin-bottom: 20px;">✓</div>
-                <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Оплата успешно</div>
-                <div style="opacity: 0.5; font-size: 15px; margin-top: 8px;">Заказ #8829 принят в работу</div>
-            `;
-            tg.HapticFeedback.notificationOccurred('success');
-            
-            setTimeout(() => {
-                document.getElementById('pay-overlay').style.display = 'none';
-                document.getElementById('sheet').classList.remove('active');
-                closeModal();
-                tg.showAlert("Благодарим за покупку! Наш менеджер свяжется с вами в Telegram.");
-                // Возврат интерфейса Apple Pay в исходное состояние
-                setTimeout(() => {
-                    location.reload(); 
-                }, 500);
-            }, 2000);
-        }, 2500);
     }
 
-    // Sakura Background
+    function processFinalPay() {
+        tg.HapticFeedback.notificationOccurred('success');
+        tg.showConfirm('Оплата подтверждена. KRISS свяжется с вами для уточнения доставки.');
+        location.reload();
+    }
+
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    // Sakura Engine
     const canvas = document.getElementById('sakura');
     const ctx = canvas.getContext('2d');
     let petals = [];
@@ -418,36 +264,13 @@
     window.addEventListener('resize', resize); resize();
     class Petal {
         constructor() { this.init(); }
-        init() { 
-            this.x = Math.random() * canvas.width; 
-            this.y = Math.random() * canvas.height - canvas.height; 
-            this.size = Math.random() * 3 + 1; 
-            this.speed = Math.random() * 0.8 + 0.3; 
-            this.opacity = Math.random() * 0.4 + 0.1;
-            this.flip = Math.random();
-        }
-        update() { 
-            this.y += this.speed; 
-            this.x += Math.sin(this.y / 80) * 0.4; 
-            if (this.y > canvas.height) this.init(); 
-        }
-        draw() { 
-            ctx.beginPath(); 
-            ctx.ellipse(this.x, this.y, this.size, this.size*(0.5 + this.flip*0.5), Math.PI/4, 0, Math.PI * 2); 
-            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`; 
-            ctx.fill(); 
-        }
+        init() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height - canvas.height; this.size = Math.random() * 2 + 1; this.speed = Math.random() * 0.2 + 0.1; this.opacity = Math.random() * 0.1 + 0.05; }
+        update() { this.y += this.speed; this.x += Math.sin(this.y / 100) * 0.1; if (this.y > canvas.height) this.init(); }
+        draw() { ctx.beginPath(); ctx.ellipse(this.x, this.y, this.size, this.size/2, Math.PI/4, 0, Math.PI * 2); ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`; ctx.fill(); }
     }
-    for (let i = 0; i < 40; i++) petals.push(new Petal());
-    function animate() { 
-        ctx.clearRect(0, 0, canvas.width, canvas.height); 
-        petals.forEach(p => { p.update(); p.draw(); }); 
-        requestAnimationFrame(animate); 
-    }
-    
-    renderCatalog();
-    animate();
+    for (let i = 0; i < 20; i++) petals.push(new Petal());
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); petals.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+    render(); animate();
 </script>
-
 </body>
 </html>
