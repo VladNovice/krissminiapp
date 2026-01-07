@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>KRISS — Noir Edition</title>
 
   <!-- Telegram Web App (будет безопасно использоваться в коде ниже) -->
@@ -46,13 +46,13 @@
 
     .nav-container{display:flex;justify-content:center;margin-bottom:20px;position:sticky;top:calc(env(safe-area-inset-top) + 10px);z-index:100}
     .nav-capsule{display:flex;background:rgba(15,15,15,0.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:4px;border-radius:22px;width:100%;box-shadow:inset 0 0 0 0.5px var(--hairline)}
-    .nav-item{flex:1;text-align:center;padding:10px 0;border-radius:18px;font-size:13px;font-weight:300;color:rgba(255,255,255,0.4);cursor:pointer}
+    .nav-item{flex:1;text-align:center;padding:10px 0;border-radius:18px;font-size:13px;font-weight:300;color:rgba(255,255,255,0.4);cursor:pointer;border:none;background:transparent}
     .nav-item.active{background:rgba(255,255,255,0.1);color:#fff}
 
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 
     .card{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:20px;overflow:hidden;position:relative;box-shadow:inset 0 0 0 0.5px var(--hairline)}
-    .img-wrap{width:100%;aspect-ratio:0.75;overflow:hidden;background:#0a0a0a;position:relative;cursor:pointer}
+    .img-wrap{width:100%;aspect-ratio:3/4;overflow:hidden;background:#0a0a0a;position:relative;cursor:pointer;display:block}
     .card img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease;display:block}
     .card img.loaded{opacity:1}
     .fav-quick-btn{position:absolute;top:10px;right:10px;z-index:2;background:rgba(0,0,0,0.3);backdrop-filter:blur(6px);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.08);cursor:pointer}
@@ -65,31 +65,33 @@
 
     .dock-container{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 20px);z-index:1000}
     .dock{background:rgba(10,10,10,0.82);backdrop-filter:blur(30px) saturate(1.2);-webkit-backdrop-filter:blur(30px) saturate(1.2);padding:12px 32px;border-radius:40px;display:flex;gap:36px;box-shadow:inset 0 0 0 0.5px var(--hairline),0 18px 36px rgba(0,0,0,0.45)}
-    .dock-btn{display:flex;flex-direction:column;align-items:center;opacity:.35;transition:opacity .2s;cursor:pointer}
+    .dock-btn{display:flex;flex-direction:column;align-items:center;opacity:.35;transition:opacity .2s;cursor:pointer;border:none;background:transparent;color:inherit;padding:6px}
     .dock-btn.active{opacity:1}
     .dock-btn svg{width:22px;height:22px;margin-bottom:4px}
     .dock-btn span{font-size:9px;font-weight:300;letter-spacing:.5px}
 
-    .modal{position:fixed;inset:0;background:#000;z-index:2000;display:none;flex-direction:column;animation:ios-slide .36s cubic-bezier(.1,.9,.2,1)}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:none;flex-direction:column;animation:ios-slide .36s cubic-bezier(.1,.9,.2,1)}
     @keyframes ios-slide{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .modal-nav{padding:calc(env(safe-area-inset-top) + 14px) 20px 10px;display:flex;justify-content:space-between;align-items:center}
-    .close-btn{background:var(--glass-active);padding:8px 18px;border-radius:20px;font-size:14px;font-weight:300;cursor:pointer}
+    .close-btn{background:var(--glass-active);padding:8px 18px;border-radius:20px;font-size:14px;font-weight:300;cursor:pointer;border:none;color:inherit}
     .modal-body{padding:0 20px 120px;overflow-y:auto}
     .modal-img-box{width:100%;border-radius:20px;overflow:hidden;margin-bottom:18px;box-shadow:inset 0 0 0 0.5px var(--hairline)}
     .modal-img-box img{width:100%;display:block}
 
     .size-wrap{display:flex;gap:10px;margin:18px 0}
-    .size-btn{flex:1;padding:14px;border-radius:16px;background:var(--glass);box-shadow:inset 0 0 0 0.5px var(--hairline);text-align:center;font-weight:300;cursor:pointer}
+    .size-btn{flex:1;padding:14px;border-radius:16px;background:var(--glass);box-shadow:inset 0 0 0 0.5px var(--hairline);text-align:center;font-weight:300;cursor:pointer;border:none;color:inherit}
     .size-btn.active{background:#fff;color:#000;font-weight:500}
     .buy-btn{width:100%;padding:18px;border-radius:22px;background:#fff;color:#000;border:none;font-size:16px;font-weight:500;cursor:pointer}
 
     .empty-state{text-align:center;margin-top:80px;opacity:.4;font-weight:200;grid-column:1/3}
+    /* focus styles */
+    :focus{outline:2px solid rgba(255,183,197,0.7);outline-offset:2px}
   </style>
 </head>
 <body>
   <canvas id="sakura" aria-hidden="true"></canvas>
 
-  <div class="app" role="application" aria-label="KRISS магазин">
+  <main class="app" role="application" aria-label="KRISS магазин" id="main-app">
     <header id="app-header">
       <!-- Логотип: kriss.png рядом с HTML-файлом. Опционно добавь kriss@2x.png -->
       <img
@@ -108,36 +110,36 @@
 
     <div class="nav-container" id="nav-container">
       <div class="nav-capsule" role="tablist" aria-label="Фильтр по категориям">
-        <div class="nav-item active" role="tab" onclick="setFilter('все', this)">Все</div>
-        <div class="nav-item" role="tab" onclick="setFilter('белье', this)">Белье</div>
-        <div class="nav-item" role="tab" onclick="setFilter('пижамы', this)">Пижамы</div>
-        <div class="nav-item" role="tab" onclick="setFilter('халаты', this)">Халаты</div>
+        <button class="nav-item active" role="tab" onclick="setFilter('все', this)">Все</button>
+        <button class="nav-item" role="tab" onclick="setFilter('белье', this)">Белье</button>
+        <button class="nav-item" role="tab" onclick="setFilter('пижамы', this)">Пижамы</button>
+        <button class="nav-item" role="tab" onclick="setFilter('халаты', this)">Халаты</button>
       </div>
     </div>
 
     <div class="grid" id="catalog" aria-live="polite"></div>
-  </div>
+  </main>
 
-  <div class="dock-container">
-    <div class="dock">
-      <div class="dock-btn active" id="btn-shop" onclick="switchTab('shop')" role="button" aria-pressed="true">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.2"/></svg>
+  <div class="dock-container" aria-hidden="false">
+    <div class="dock" role="toolbar" aria-label="Навигация">
+      <button class="dock-btn active" id="btn-shop" onclick="switchTab('shop')" aria-pressed="true" title="Магазин">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="1.2"/></svg>
         <span>МАГАЗИН</span>
-      </div>
-      <div class="dock-btn" id="btn-search" onclick="switchTab('search')" role="button">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="1.2"/></svg>
+      </button>
+      <button class="dock-btn" id="btn-search" onclick="switchTab('search')" aria-pressed="false" title="Поиск">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="1.2"/></svg>
         <span>ПОИСК</span>
-      </div>
-      <div class="dock-btn" id="btn-fav" onclick="switchTab('fav')" role="button">
-        <svg fill="none" stroke="currentColor" id="fav-dock-icon" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.2"/></svg>
+      </button>
+      <button class="dock-btn" id="btn-fav" onclick="switchTab('fav')" aria-pressed="false" title="Любимое">
+        <svg fill="none" stroke="currentColor" id="fav-dock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.2"/></svg>
         <span>ЛЮБИМОЕ</span>
-      </div>
+      </button>
     </div>
   </div>
 
-  <div id="modal" class="modal" role="dialog" aria-hidden="true">
+  <div id="modal" class="modal" role="dialog" aria-hidden="true" aria-modal="false">
     <div class="modal-nav">
-      <div class="close-btn" onclick="closeModal()" role="button">Назад</div>
+      <button class="close-btn" id="modal-close" onclick="closeModal()" aria-label="Назад">Назад</button>
       <div style="font-weight:200;letter-spacing:2px;font-size:13px;opacity:.5">KRISS NOIR</div>
       <div style="width:60px"></div>
     </div>
@@ -152,6 +154,7 @@
       try { tg.backgroundColor = '#000000'; } catch (e) { /* ignore */ }
     }
 
+    // --- Данные продуктов (пример) ---
     const PRODUCTS = [
       { id:1, cat:'белье', name:"Lace Noir Set", price:8500, img:"photo1.jpg", desc:"Сексуальное черное кружево ручной работы. Идеальная посадка и французский шарм." },
       { id:2, cat:'пижамы', name:"Silk Pearl Gown", price:12900, img:"photo2.jpg", desc:"Натуральный шелк в жемчужном оттенке. Невесомая роскошь для ваших ночей." },
@@ -159,10 +162,22 @@
       { id:4, cat:'халаты', name:"Midnight Kimono", price:15600, img:"photo4.jpg", desc:"Длинный халат из тяжелого шелка. Глубокий черный цвет и матовый блеск." }
     ];
 
-    let favorites = JSON.parse(localStorage.getItem('kriss_favs') || '[]');
+    // --- favorites из localStorage с защитой ---
+    let favorites = [];
+    try {
+      const raw = localStorage.getItem('kriss_favs');
+      favorites = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(favorites)) favorites = [];
+    } catch (e) {
+      console.warn('kriss_favs parsing error, resetting', e);
+      favorites = [];
+    }
+
     let currentTab = 'shop';
     let currentFilter = 'все';
+    let lastFocusedElementBeforeModal = null;
 
+    // --- Рендер каталога ---
     function render(data){
       const catalog = document.getElementById('catalog');
       if(!data || data.length === 0){
@@ -171,47 +186,60 @@
       }
       catalog.innerHTML = data.map(p => {
         const isFav = favorites.includes(p.id);
+        // Вставляем безопасно: данные из PRODUCTS контролируемы локально. Если данные с сервера, экранируйте.
         return `
-          <div class="card" role="article" aria-label="${p.name}">
-            <div class="fav-quick-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${p.id})" aria-pressed="${isFav}">
-              <svg width="18" height="18" fill="${isFav ? 'var(--sakura)' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.5"/></svg>
+          <article class="card" role="article" aria-label="${escapeHtml(p.name)}">
+            <button class="fav-quick-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${p.id})" aria-pressed="${isFav}" aria-label="${isFav ? 'Убрать из избранного' : 'Добавить в избранное'}">
+              <svg width="18" height="18" fill="${isFav ? 'var(--sakura)' : 'none'}" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="1.5"/></svg>
+            </button>
+            <div class="img-wrap" role="button" tabindex="0" onclick="openProduct(${p.id})" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); openProduct(${p.id}); }" aria-label="Открыть ${escapeHtml(p.name)}">
+              <img data-src="${p.img}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" src="https://via.placeholder.com/400x600/111/111?text=KRISS">
             </div>
-            <div class="img-wrap" onclick="openProduct(${p.id})">
-              <img data-src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onload="this.classList.add('loaded')" src="https://via.placeholder.com/400x600/111/111?text=KRISS">
+            <div class="card-body" onclick="openProduct(${p.id})" onkeydown="if(event.key==='Enter'||event.key===' ') openProduct(${p.id})" role="button" tabindex="0">
+              <div class="card-cat">${escapeHtml(p.cat)}</div>
+              <div class="card-name">${escapeHtml(p.name)}</div>
+              <div class="card-price">${formatPrice(p.price)} ₽</div>
             </div>
-            <div class="card-body" onclick="openProduct(${p.id})">
-              <div class="card-cat">${p.cat}</div>
-              <div class="card-name">${p.name}</div>
-              <div class="card-price">${p.price.toLocaleString()} ₽</div>
-            </div>
-          </div>
+          </article>
         `;
       }).join('');
       // Подгружаем реальные src картинок после рендера (плавная подстановка)
       document.querySelectorAll('.img-wrap img[data-src]').forEach(img => {
         const real = img.getAttribute('data-src');
         const tmp = new Image();
-        tmp.onload = () => { img.src = real; };
+        tmp.onload = () => { img.src = real; img.classList.add('loaded'); };
+        tmp.onerror = () => { /* если изображение недоступно, оставляем плейсхолдер */ };
         tmp.src = real;
       });
     }
 
+    // --- Утилиты ---
+    function formatPrice(n){ return n.toLocaleString(); }
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"'`=\/]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'})[s]);
+    }
+
+    // --- Переключение вкладок ---
     function switchTab(tab){
       currentTab = tab;
-      document.querySelectorAll('.dock-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.dock-btn').forEach(btn => { btn.classList.remove('active'); btn.setAttribute('aria-pressed','false'); });
       document.getElementById('search-box').style.display = 'none';
       document.getElementById('nav-container').style.display = 'flex';
 
       if(tab === 'shop'){
-        document.getElementById('btn-shop').classList.add('active');
+        const btn = document.getElementById('btn-shop');
+        btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
         render(PRODUCTS.filter(p => currentFilter === 'все' || p.cat === currentFilter));
       } else if(tab === 'search'){
-        document.getElementById('btn-search').classList.add('active');
+        const btn = document.getElementById('btn-search');
+        btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
         document.getElementById('search-box').style.display = 'block';
-        document.getElementById('search-input').focus();
+        const input = document.getElementById('search-input');
+        input.focus();
         handleSearch();
       } else if(tab === 'fav'){
-        document.getElementById('btn-fav').classList.add('active');
+        const btn = document.getElementById('btn-fav');
+        btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
         document.getElementById('nav-container').style.display = 'none';
         const favProducts = PRODUCTS.filter(p => favorites.includes(p.id));
         render(favProducts);
@@ -219,63 +247,134 @@
       if(tg && tg.HapticFeedback) try { tg.HapticFeedback.impactOccurred('light'); } catch(e){}
     }
 
+    // --- Поиск ---
     function handleSearch(){
-      const query = document.getElementById('search-input').value.toLowerCase();
-      const filtered = PRODUCTS.filter(p => p.name.toLowerCase().includes(query) || p.cat.toLowerCase().includes(query));
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const filtered = PRODUCTS.filter(p => {
+        if (!query) return true;
+        return p.name.toLowerCase().includes(query) || p.cat.toLowerCase().includes(query);
+      });
       render(filtered);
     }
 
+    // --- Фильтры по категориям ---
     function setFilter(category, el){
       currentFilter = category;
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
+      if (el) el.classList.add('active');
       if(currentTab === 'shop') render(PRODUCTS.filter(p => category === 'все' || p.cat === category));
       if(tg && tg.HapticFeedback) try { tg.HapticFeedback.impactOccurred('light'); } catch(e){}
     }
 
+    // --- Избранное ---
     function toggleFav(event, id){
       event.stopPropagation();
-      if(favorites.includes(id)) favorites = favorites.filter(fid => fid !== id);
-      else { favorites.push(id); if(tg && tg.HapticFeedback) try { tg.HapticFeedback.notificationOccurred('success'); } catch(e){} }
-      localStorage.setItem('kriss_favs', JSON.stringify(favorites));
-      // Обновляем вид
-      if(currentTab === 'fav') switchTab('fav'); else render(
-        PRODUCTS.filter(p => currentTab === 'search' ? true : (currentFilter === 'все' || p.cat === currentFilter))
-      );
+      if (favorites.includes(id)) {
+        favorites = favorites.filter(fid => fid !== id);
+      } else {
+        favorites.push(id);
+        if(tg && tg.HapticFeedback) try { tg.HapticFeedback.notificationOccurred('success'); } catch(e){}
+      }
+      try { localStorage.setItem('kriss_favs', JSON.stringify(favorites)); } catch(e){ console.warn('localStorage set error', e); }
+
+      // Если мы на вкладке избранного — перезапросим её. Если в поиске — восстановим результаты поиска, иначе применим текущий фильтр.
+      if(currentTab === 'fav') {
+        switchTab('fav');
+      } else if (currentTab === 'search') {
+        handleSearch();
+      } else {
+        render(PRODUCTS.filter(p => currentFilter === 'все' || p.cat === currentFilter));
+      }
       if(tg && tg.HapticFeedback) try { tg.HapticFeedback.impactOccurred('medium'); } catch(e){}
     }
 
+    // --- Модал: открытие/закрытие и фокус-трап ---
     function openProduct(id){
       const p = PRODUCTS.find(x => x.id === id);
+      if(!p) return;
       const modal = document.getElementById('modal');
       const content = document.getElementById('modal-content');
       content.innerHTML = `
-        <div class="modal-img-box"><img src="${p.img}" alt="${p.name}" loading="lazy" decoding="async"></div>
-        <div class="card-cat" style="margin-bottom:8px">${p.cat}</div>
-        <h2 style="font-weight:200;font-size:28px;margin-bottom:12px">${p.name}</h2>
-        <p style="opacity:.6;font-weight:300;line-height:1.6;margin-bottom:20px">${p.desc}</p>
+        <div class="modal-img-box"><img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" onerror="this.src='https://via.placeholder.com/800x1067/111/111?text=KRISS'"></div>
+        <div class="card-cat" style="margin-bottom:8px">${escapeHtml(p.cat)}</div>
+        <h2 style="font-weight:200;font-size:28px;margin-bottom:12px">${escapeHtml(p.name)}</h2>
+        <p style="opacity:.6;font-weight:300;line-height:1.6;margin-bottom:20px">${escapeHtml(p.desc)}</p>
         <div class="size-wrap">
-          <div class="size-btn active" onclick="selectSize(this)">S</div>
-          <div class="size-btn" onclick="selectSize(this)">M</div>
-          <div class="size-btn" onclick="selectSize(this)">L</div>
+          <button class="size-btn active" onclick="selectSize(this)">S</button>
+          <button class="size-btn" onclick="selectSize(this)">M</button>
+          <button class="size-btn" onclick="selectSize(this)">L</button>
         </div>
-        <button class="buy-btn" onclick="addToCart(${p.id})">Добавить — ${p.price.toLocaleString()} ₽</button>
+        <button class="buy-btn" onclick="addToCart(${p.id})">Добавить — ${formatPrice(p.price)} ₽</button>
       `;
+      // Скрываем основной контент от скринридеров
+      const main = document.getElementById('main-app');
+      main.setAttribute('aria-hidden', 'true');
+      main.inert = true; // неподдерживаемый везде, но если есть — хорошо
+      lastFocusedElementBeforeModal = document.activeElement;
+
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden', 'false');
+      modal.setAttribute('aria-modal', 'true');
+
+      // Фокус на кнопку закрытия
+      const closeBtn = document.getElementById('modal-close');
+      if (closeBtn) closeBtn.focus();
+
+      // Добавляем слушатель клавиш для Esc и trap Tab
+      document.addEventListener('keydown', modalKeyHandler);
+
       if(tg && tg.HapticFeedback) try { tg.HapticFeedback.impactOccurred('medium'); } catch(e){}
+    }
+
+    function modalKeyHandler(e){
+      const modal = document.getElementById('modal');
+      if (!modal || modal.getAttribute('aria-hidden') === 'true') return;
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeModal();
+        return;
+      }
+      if (e.key === 'Tab') {
+        // Trap focus inside modal
+        const focusable = modal.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) { e.preventDefault(); return; }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    function closeModal(){
+      const modal = document.getElementById('modal');
+      if(!modal || modal.getAttribute('aria-hidden') === 'true') return;
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      modal.setAttribute('aria-modal', 'false');
+
+      const main = document.getElementById('main-app');
+      main.setAttribute('aria-hidden', 'false');
+      try { main.inert = false; } catch(e){ /* ignore */ }
+
+      // Удаляем слушатель
+      document.removeEventListener('keydown', modalKeyHandler);
+
+      // Восстанавливаем фокус
+      if (lastFocusedElementBeforeModal && typeof lastFocusedElementBeforeModal.focus === 'function') {
+        lastFocusedElementBeforeModal.focus();
+      }
     }
 
     function selectSize(el){
       document.querySelectorAll('.size-btn').forEach(s => s.classList.remove('active'));
       el.classList.add('active');
       if(tg && tg.HapticFeedback) try { tg.HapticFeedback.selectionChanged(); } catch(e){}
-    }
-
-    function closeModal(){
-      const modal = document.getElementById('modal');
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
     }
 
     function addToCart(id){
@@ -300,32 +399,51 @@
 
     // Initial render
     render(PRODUCTS);
+
     /* --- Авто-открытие товара из URL (?product=product_1 или ?product=1) --- */
-(function(){
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const productParam = params.get('product'); // ожидаем "product_1" или "1"
-    let pid = null;
-    if (productParam) {
-      if (productParam.startsWith('product_')) {
-        pid = parseInt(productParam.replace('product_', ''), 10);
-      } else if (/^\d+$/.test(productParam)) {
-        pid = parseInt(productParam, 10);
-      }
-    }
-    if (pid) {
-      // немного ждем, чтобы DOM и рендер завершились
-      setTimeout(() => {
-        if (typeof openProduct === 'function') {
-          openProduct(pid, false); // false — не пушить новый history, просто открыть
-        } else {
-          console.warn('openProduct не найден в глобальной области');
+    (function(){
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const productParam = params.get('product'); // ожидаем "product_1" или "1"
+        let pid = null;
+        if (productParam) {
+          if (productParam.startsWith('product_')) {
+            pid = parseInt(productParam.replace('product_', ''), 10);
+          } else if (/^\d+$/.test(productParam)) {
+            pid = parseInt(productParam, 10);
+          }
         }
-      }, 120);
-    }
-  } catch (e) {
-    console.error('Auto-open product error:', e);
-  })();
+        if (pid) {
+          // небольшой таймаут для того, чтобы рендер завершился
+          setTimeout(() => {
+            if (typeof openProduct === 'function') {
+              openProduct(pid); // вызываем только с id
+            } else {
+              console.warn('openProduct не найден в глобальной области');
+            }
+          }, 120);
+        }
+      } catch (e) {
+        console.error('Auto-open product error:', e);
+      }
+    })();
+
+    // --- Небольшие улучшения: клавиатурные обработчики для dock и nav (чтобы Enter/Space работали) ---
+    document.querySelectorAll('.dock-btn').forEach(b => {
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); }
+      });
+    });
+    document.querySelectorAll('.nav-item').forEach(b => {
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); }
+      });
+    });
+
+    // Prevent form autofill changes to break search on mobile when toggling tabs (very small safeguard)
+    window.addEventListener('pageshow', () => {
+      try { document.getElementById('search-input').value = document.getElementById('search-input').value || ''; } catch(e){}
+    });
   </script>
 </body>
 </html>
