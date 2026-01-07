@@ -300,6 +300,32 @@
 
     // Initial render
     render(PRODUCTS);
+    /* --- Авто-открытие товара из URL (?product=product_1 или ?product=1) --- */
+(function(){
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const productParam = params.get('product'); // ожидаем "product_1" или "1"
+    let pid = null;
+    if (productParam) {
+      if (productParam.startsWith('product_')) {
+        pid = parseInt(productParam.replace('product_', ''), 10);
+      } else if (/^\d+$/.test(productParam)) {
+        pid = parseInt(productParam, 10);
+      }
+    }
+    if (pid) {
+      // немного ждем, чтобы DOM и рендер завершились
+      setTimeout(() => {
+        if (typeof openProduct === 'function') {
+          openProduct(pid, false); // false — не пушить новый history, просто открыть
+        } else {
+          console.warn('openProduct не найден в глобальной области');
+        }
+      }, 120);
+    }
+  } catch (e) {
+    console.error('Auto-open product error:', e);
+  }
   </script>
 </body>
 </html>
